@@ -1,0 +1,55 @@
+ID: warehouseVisualization
+_schema-version: "2.1"
+description: Warehouse visualization
+parameters:
+  deploy_mode: html5-repo
+version: 0.0.1
+modules:
+  - name: warehouseVisualization_appRouter
+    type: approuter.nodejs
+    path: warehouseVisualization_appRouter
+    parameters:
+      disk-quota: 256M
+      memory: 256M
+    requires:
+      - name: warehouseVisualization_html5_repo_runtime
+  - name: warehouseVisualization_ui_deployer
+    type: com.sap.html5.application-content
+    path: warehouseVisualization_ui_deployer
+    requires:
+      - name: warehouseVisualization_html5_repo_host
+  - name: warehouseVisualization-db
+    type: hdb
+    path: db
+    parameters:
+      memory: 256M
+      disk-quota: 256M
+    requires:
+      - name: warehouseVisualization-db-hdi-container
+  - name: warehouseVisualization-srv
+    type: nodejs
+    path: srv
+    parameters:
+      memory: 512M
+      disk-quota: 256M
+    provides:
+      - name: srv_api
+        properties:
+          url: ${default-url}
+    requires:
+      - name: warehouseVisualization-db-hdi-container
+resources:
+  - name: warehouseVisualization_html5_repo_runtime
+    parameters:
+      service-plan: app-runtime
+      service: html5-apps-repo
+    type: org.cloudfoundry.managed-service
+  - name: warehouseVisualization_html5_repo_host
+    parameters:
+      service-plan: app-host
+      service: html5-apps-repo
+    type: org.cloudfoundry.managed-service
+  - name: warehouseVisualization-db-hdi-container
+    type: com.sap.xs.hdi-container
+    properties:
+      hdi-container-name: ${service-name}
