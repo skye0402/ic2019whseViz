@@ -1,9 +1,11 @@
-<mvc:View controllerName="warehouseViewer.warehouseViewer.controller.whseView" xmlns:mvc="sap.ui.core.mvc" displayBlock="true" xmlns="sap.m">
+<mvc:View controllerName="warehouseViewer.warehouseViewer.controller.whseView" xmlns:html="http://www.w3.org/1999/xhtml"
+	xmlns:mvc="sap.ui.core.mvc" displayBlock="true" xmlns="sap.m" xmlns:c="sap.ui.core" xmlns:vk="sap.ui.vk">
 	<Shell id="shell">
 		<App id="app">
 			<pages>
-				<Page id="page" title="{i18n>title}">
-					<content></content>
+				<Page title="{i18n>title}">
+					<vk:Viewer id="viewer">
+					</vk:Viewer>
 				</Page>
 			</pages>
 		</App>
