@@ -12,12 +12,13 @@ type MAX_CAPA : Decimal(15, 3); // Total Capacity of Storage Bin
 type FCAPA : Decimal(15, 3); // Available Capacity in Storage Bin
 type KZLER : String(1); //Indicator Whether Storage Bin is Empty
 type KZVOL : String(1); //Indicator Whether Storage Bin is Full
-type X_CORD : Integer; // X Coordinate
-type Y_CORD : Integer; // Y Coordinate
-type Z_CORD : Integer; // Z Coordinate
-type MAX_LENGTH : Integer; // Length
-type MAX_WIDTH : Integer; // Width
-type MAX_HEIGHT : Integer; // Height
+type X_CORD : Decimal(15, 2); // X Coordinate
+type Y_CORD : Decimal(15, 2); // Y Coordinate
+type Z_CORD : Decimal(15, 2); // Z Coordinate
+type MAX_LENGTH : Decimal(15, 2); // Length
+type MAX_WIDTH : Decimal(15, 2); // Width
+type MAX_HEIGHT : Decimal(15, 2); // Height
+type UOM : String(3); // Unit of measure
 
 @OData.publish : true
 context warehouseBins {
@@ -37,6 +38,7 @@ context warehouseBins {
             xC       : X_CORD;
             yC       : Y_CORD;
             zC       : Z_CORD;
+            unit	 : UOM;
     }
 
     entity binType {
@@ -45,6 +47,7 @@ context warehouseBins {
             maxLength : MAX_LENGTH;
             maxWidth  : MAX_WIDTH;
             maxHeight : MAX_HEIGHT;
+            unit	  : UOM;
     }
     
 };

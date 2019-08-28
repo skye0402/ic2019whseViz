@@ -1,5 +1,5 @@
 ID: warehouseVisualization
-_schema-version: "2.1"
+_schema-version: '2.1'
 description: Warehouse visualization
 parameters:
   deploy_mode: html5-repo
@@ -13,11 +13,18 @@ modules:
       memory: 256M
     requires:
       - name: warehouseVisualization_html5_repo_runtime
+      - name: uaa_warehouseVisualization
   - name: warehouseVisualization_ui_deployer
     type: com.sap.html5.application-content
     path: warehouseVisualization_ui_deployer
     requires:
       - name: warehouseVisualization_html5_repo_host
+    build-parameters:
+      requires:
+        - name: warehouseViewer
+          artifacts:
+            - './*'
+          target-path: resources/warehouseViewer
   - name: warehouseVisualization-db
     type: hdb
     path: db
@@ -35,9 +42,16 @@ modules:
     provides:
       - name: srv_api
         properties:
-          url: ${default-url}
+          url: '${default-url}'
     requires:
       - name: warehouseVisualization-db-hdi-container
+  - name: warehouseViewer
+    type: html5
+    path: warehouseViewer
+    build-parameters:
+      builder: grunt
+      supported-platforms: []
+      build-result: dist
 resources:
   - name: warehouseVisualization_html5_repo_runtime
     parameters:
@@ -52,4 +66,15 @@ resources:
   - name: warehouseVisualization-db-hdi-container
     type: com.sap.xs.hdi-container
     properties:
-      hdi-container-name: ${service-name}
+      hdi-container-name: '${service-name}'
+  - name: uaa_warehouseVisualization
+    parameters:
+      path: ./xs-security.json
+      service-plan: application
+      service: xsuaa
+    type: org.cloudfoundry.managed-service
+  - name: dest_warehouseVisualization
+    parameters:
+      service-plan: lite
+      service: destination
+    type: org.cloudfoundry.managed-service
