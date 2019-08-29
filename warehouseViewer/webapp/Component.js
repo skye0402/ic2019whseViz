@@ -25,6 +25,35 @@ sap.ui.define([
 
 			// set the device model
 			this.setModel(models.createDeviceModel(), "device");
+
+			var oModel = this.getModel("warehouseBins"),
+				bRefreshed;
+			var oListBinding = oModel.bindList("/Bins", undefined, undefined, undefined, {
+				$select: "whseBin"
+			});
+
+			function handleChange(oEvent) {
+				var aContexts = oListBinding.getContexts(0, 10),
+					oData;
+				if (bRefreshed) {
+					oData = {
+						People: aContexts.map(oContext => oContext.getObject())
+					};
+					oData.People.unshift({
+						UserName: "Add new user"
+					});
+					oJSONModel.setData(oData);
+				} else {
+					oListBinding.attachEventOnce("change", handleChange);
+				}
+			}
+
+			oListBinding.getContexts(0, 10);
+			oListBinding.attachEventOnce("change", handleChange);
+			oListBinding.attachEventOnce("refresh", function (oEvent) {
+				oListBinding.getContexts(0, 10);
+				bRefreshed = true;
+			});
 		}
 	});
 });

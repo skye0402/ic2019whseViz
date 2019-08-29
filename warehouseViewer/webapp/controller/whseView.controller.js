@@ -3,8 +3,9 @@ sap.ui.define([
 	"sap/m/MessageToast",
 	"sap/ui/vk/ContentResource",
 	"sap/ui/vk/ContentConnector",
-	"sap/ui/vk/threejs/thirdparty/three"
-], function (Controller, MessageToast, ContentResource, ContentConnector, threejs) {
+	"sap/ui/vk/threejs/thirdparty/three",
+	"sap/ui/model/odata/v4/ODataModel"
+], function (Controller, MessageToast, ContentResource, ContentConnector, threejs, ODataModel) {
 	"use strict";
 
 	// ----------- Threejs functions and variables ------------------
@@ -42,7 +43,7 @@ sap.ui.define([
 		bulbPower: Object.keys(bulbLuminousPowers)[4],
 		hemiIrradiance: Object.keys(hemiLuminousIrradiances)[0]
 	};
-	
+
 	var previousShadowMap = false;
 
 	return Controller.extend("warehouseViewer.warehouseViewer.controller.whseView", {
@@ -73,7 +74,7 @@ sap.ui.define([
 			ContentConnector.addContentManagerResolver(threejsContentManagerResolver);
 
 			init();
-			
+
 			this.getView().byId("viewer").addContentResource(
 				new ContentResource({
 					source: scene,
@@ -81,11 +82,11 @@ sap.ui.define([
 					name: "Scene"
 				})
 			);
+
+			//var oWhseBins = new ODataModel("storageBinData");
 			//animate();
 		}
 	});
-
-
 
 	function init() {
 		/*var container = document.getElementById('container');
@@ -225,19 +226,19 @@ sap.ui.define([
 		gui.open();*/
 	}
 
-/*	function initObject(obj, name, posX, posY, posZ, id) {
-		obj.name = name;
-		obj.position.set(posX, posY, posZ);
-		obj.userData.treeNode = {
-			sid: id
-		};
-	}*/
+	/*	function initObject(obj, name, posX, posY, posZ, id) {
+			obj.name = name;
+			obj.position.set(posX, posY, posZ);
+			obj.userData.treeNode = {
+				sid: id
+			};
+		}*/
 
-/*	function onWindowResize() {
-		camera.aspect = window.innerWidth / window.innerHeight;
-		camera.updateProjectionMatrix();
-		renderer.setSize(window.innerWidth, window.innerHeight);
-	}*/
+	/*	function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+		}*/
 	//
 	function animate() {
 		requestAnimationFrame(animate);

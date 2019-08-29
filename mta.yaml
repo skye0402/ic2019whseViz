@@ -13,6 +13,12 @@ modules:
       memory: 256M
     requires:
       - name: warehouseVisualization_html5_repo_runtime
+      - name: srv_api
+        group: destinations
+        properties:
+          forwardAuthToken: true
+          name: srv_api
+          url: '~{url}'
       - name: uaa_warehouseVisualization
   - name: warehouseVisualization_ui_deployer
     type: com.sap.html5.application-content
@@ -25,6 +31,10 @@ modules:
           artifacts:
             - './*'
           target-path: resources/warehouseViewer
+        - name: DUMMYV4
+          artifacts:
+            - './*'
+          target-path: resources/DUMMYV4
   - name: warehouseVisualization-db
     type: hdb
     path: db
@@ -48,6 +58,13 @@ modules:
   - name: warehouseViewer
     type: html5
     path: warehouseViewer
+    build-parameters:
+      builder: grunt
+      supported-platforms: []
+      build-result: dist
+  - name: DUMMYV4
+    type: html5
+    path: DUMMYV4
     build-parameters:
       builder: grunt
       supported-platforms: []

@@ -10,11 +10,20 @@
 		"title": "{{appTitle}}",
 		"description": "{{appDescription}}",
 		"sourceTemplate": {
-			"id": "html5moduletemplates.basicSAPUI5ApplicationProjectModule",
-			"version": "1.40.12"
+			"id": "servicecatalog.connectivityComponentForManifest",
+			"version": "0.0.0"
+		},
+		"dataSources": {
+			"warehouseService": {
+				"uri": "/srv_api/warehouse/",
+				"type": "OData",
+				"settings": {
+					"odataVersion": "4.0",
+					"localUri": "localService/metadata.xml"
+				}
+			}
 		}
 	},
-
 	"sap.ui": {
 		"technology": "UI5",
 		"icons": {
@@ -31,7 +40,6 @@
 			"phone": true
 		}
 	},
-
 	"sap.ui5": {
 		"flexEnabled": false,
 		"rootView": {
@@ -58,6 +66,17 @@
 				"settings": {
 					"bundleName": "warehouseViewer.warehouseViewer.i18n.i18n"
 				}
+			},
+			"warehouseBins": {
+				"type": "sap.ui.model.odata.v4.ODataModel",
+				"settings": {
+					"operationMode": "Server",
+					"synchronizationMode": "None",
+					"groupId": "$auto",
+					"autoExpandSelect": true
+				},
+				"dataSource": "warehouseService",
+				"preload": true
 			}
 		},
 		"resources": {
