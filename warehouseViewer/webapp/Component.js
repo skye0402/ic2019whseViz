@@ -31,27 +31,25 @@ sap.ui.define([
 			var oListBinding = oModel.bindList("/Bins", undefined, undefined, undefined, {
 				$select: "whseBin"
 			});
-
+			var oJSONModel = this.getModel("whseBinsJSON");
+			
 			function handleChange(oEvent) {
-				var aContexts = oListBinding.getContexts(0, 10),
+				var aContexts = oListBinding.getContexts(0, 300), //get first 10 entries
 					oData;
 				if (bRefreshed) {
 					oData = {
-						People: aContexts.map(oContext => oContext.getObject())
+						WhseBins: aContexts.map(oContext => oContext.getObject())
 					};
-					oData.People.unshift({
-						UserName: "Add new user"
-					});
 					oJSONModel.setData(oData);
 				} else {
 					oListBinding.attachEventOnce("change", handleChange);
 				}
 			}
 
-			oListBinding.getContexts(0, 10);
+			oListBinding.getContexts(0, 300);
 			oListBinding.attachEventOnce("change", handleChange);
 			oListBinding.attachEventOnce("refresh", function (oEvent) {
-				oListBinding.getContexts(0, 10);
+				oListBinding.getContexts(0, 300);
 				bRefreshed = true;
 			});
 		}

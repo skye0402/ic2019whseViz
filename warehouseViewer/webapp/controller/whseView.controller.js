@@ -10,7 +10,7 @@ sap.ui.define([
 
 	// ----------- Threejs functions and variables ------------------
 	var camera, scene, renderer,
-		bulbLight, bulbMat, hemiLight, stats;
+		hemiLight, stats;
 	var ballMat, cubeMat, floorMat;
 	// ref for lumens: http://www.power-sure.com/lumens.htm
 	var bulbLuminousPowers = {
@@ -73,7 +73,9 @@ sap.ui.define([
 
 			ContentConnector.addContentManagerResolver(threejsContentManagerResolver);
 
-			init();
+			//			Get storage bin data and pass it to the init function
+			var oJSONModel = this.getView().getModel("whseBinsJSON");
+			init(oJSONModel.oData.WhseBins);
 
 			this.getView().byId("viewer").addContentResource(
 				new ContentResource({
@@ -83,33 +85,35 @@ sap.ui.define([
 				})
 			);
 
-			//var oWhseBins = new ODataModel("storageBinData");
 			//animate();
 		}
 	});
 
-	function init() {
-		/*var container = document.getElementById('container');
-		stats = new Stats();
-		container.appendChild(stats.dom);*/
+	function init(binData) {
 		camera = new THREE.PerspectiveCamera(50, 1.6, 0.1, 100); //----TODO Must adjust the ratio dynamically!
 		camera.position.x = -4;
 		camera.position.z = 4;
 		camera.position.y = 2;
 		scene = new THREE.Scene();
 		scene.name = "Warehouse";
-		var bulbGeometry = new THREE.SphereBufferGeometry(0.02, 16, 8);
-		bulbLight = new THREE.PointLight(0xffee88, 1, 100, 2);
-		bulbLight.name = "Lightbulb 1";
-		bulbMat = new THREE.MeshStandardMaterial({
-			emissive: 0xffffee,
-			emissiveIntensity: 1,
-			color: 0x000000
-		});
-		bulbLight.add(new THREE.Mesh(bulbGeometry, bulbMat));
-		bulbLight.position.set(0, 2, 0);
-		bulbLight.castShadow = true;
-		scene.add(bulbLight);
+
+		// create ceiling lights
+		
+		for (var i = 1; i < 4; i++) {
+			var bulbGeometry = new THREE.SphereBufferGeometry(0.02, 16, 8);
+			var bulbLight = new THREE.PointLight(0xffee88, 1, 100, 2);
+			bulbLight.name = "Warehouse Light " + toString(i);
+			var bulbMat = new THREE.MeshStandardMaterial({
+				emissive: 0xffffee,
+				emissiveIntensity: 1,
+				color: 0x000000
+			});
+			bulbLight.add(new THREE.Mesh(bulbGeometry, bulbMat));
+			bulbLight.position.set(10, 3, i * 10);
+			bulbLight.castShadow = true;
+			scene.add(bulbLight);
+		}
+
 		hemiLight = new THREE.HemisphereLight(0xddeeff, 0x0f0e0d, 0.02);
 		hemiLight.name = "Surrounding light";
 		scene.add(hemiLight);
@@ -181,7 +185,7 @@ sap.ui.define([
 			ballMat.metalnessMap = map;
 			ballMat.needsUpdate = true;
 		});
-		var floorGeometry = new THREE.PlaneBufferGeometry(20, 20);
+		var floorGeometry = new THREE.PlaneBufferGeometry(100, 80);
 		var floorMesh = new THREE.Mesh(floorGeometry, floorMat);
 		floorMesh.name = "Floor mesh";
 		floorMesh.receiveShadow = true;
@@ -194,19 +198,19 @@ sap.ui.define([
 		ballMesh.rotation.y = Math.PI;
 		ballMesh.castShadow = true;
 		scene.add(ballMesh);
-		var boxGeometry = new THREE.BoxBufferGeometry(0.5, 0.5, 0.5);
-		var boxMesh = new THREE.Mesh(boxGeometry, cubeMat);
-		boxMesh.position.set(-0.5, 0.25, -1);
-		boxMesh.castShadow = true;
-		scene.add(boxMesh);
-		var boxMesh2 = new THREE.Mesh(boxGeometry, cubeMat);
-		boxMesh2.position.set(0, 0.25, -5);
-		boxMesh2.castShadow = true;
-		scene.add(boxMesh2);
-		var boxMesh3 = new THREE.Mesh(boxGeometry, cubeMat);
-		boxMesh3.position.set(7, 0.25, 0);
-		boxMesh3.castShadow = true;
-		scene.add(boxMesh3);
+		//H	0.6 B	0.35 T	0.40
+		var boxGeometry = new THREE.BoxBufferGeometry(0.58, 0.58, 0.33);
+
+		// Create bin visualization from EWM Masterdata
+		for (var i = 0; i < binData.length; i++) {
+			var obj = binData[i];
+			var boxMesh = new THREE.Mesh(boxGeometry, cubeMat);
+			boxMesh.position.set(parseFloat(obj.xC), parseFloat(obj.zC) + 0.25, parseFloat(obj.yC));
+			boxMesh.castShadow = true;
+			boxMesh.name = obj.binNo;
+			scene.add(boxMesh);
+		}
+
 		renderer = new THREE.WebGLRenderer();
 		renderer.physicallyCorrectLights = true;
 		renderer.gammaInput = true;

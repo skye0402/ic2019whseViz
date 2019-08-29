@@ -77,6 +77,9 @@
 				},
 				"dataSource": "warehouseService",
 				"preload": true
+			},
+			"whseBinsJSON": {
+				"type": "sap.ui.model.json.JSONModel"
 			}
 		},
 		"resources": {
