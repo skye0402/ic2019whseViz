@@ -45,50 +45,7 @@ sap.ui.define([
 
 	var previousShadowMap = false;
 
-	return Controller.extend("warehouseViewer.warehouseViewer.controller.whseView", {
-		onInit: function () {
-
-			function threejsObjectLoader(parentNode, contentResource) {
-				parentNode.add(contentResource.getSource());
-				return Promise.resolve({
-					node: parentNode,
-					contentResource: contentResource
-				});
-			}
-
-			function threejsContentManagerResolver(contentResource) {
-				if (contentResource.getSource() instanceof THREE.Object3D) {
-					return Promise.resolve({
-						dimension: 3,
-						contentManagerClassName: "sap.ui.vk.threejs.ContentManager",
-						settings: {
-							loader: threejsObjectLoader
-						}
-					});
-				} else {
-					return Promise.reject();
-				}
-			}
-
-			ContentConnector.addContentManagerResolver(threejsContentManagerResolver);
-
-			//Get storage bin data and pass it to the init function
-			var oJSONModel = this.getView().getModel("whseBinsJSON");
-			init(oJSONModel.oData.WhseBins);
-
-			this.getView().byId("viewer").addContentResource(
-				new ContentResource({
-					source: scene,
-					sourceType: "THREE.Scene",
-					name: "Scene"
-				})
-			);
-
-			//animate();
-		}
-	});
-
-	function init(binData) {
+	function init(binData, binTypeData) {
 		camera = new THREE.PerspectiveCamera(50, 1.6, 0.1, 100); //----TODO Must adjust the ratio dynamically!
 		camera.position.x = -4;
 		camera.position.z = 4;
@@ -96,7 +53,7 @@ sap.ui.define([
 		scene = new THREE.Scene();
 		scene.name = "Warehouse";
 
-		// Load models
+		// Load 3D models
 		var url = "https://threejs.org/examples/js/loaders/GLTFLoader.js";
 
 		jQuery.ajax({
@@ -105,8 +62,22 @@ sap.ui.define([
 			cache: true
 		}).done(function () {
 			var loader = new THREE.GLTFLoader();
-			loader.load('resources/Forklift.gltf', function (gltf) {
-				gltf.name = "Forklift";
+			loader.load("resources/Forklift.gltf", function (gltf) {
+				gltf.scene.name = "Forklift";
+				gltf.scene.position.x = 15;
+				gltf.scene.position.y = 0.25;
+				gltf.scene.position.z = 24;
+				gltf.scene.castShadow = true;
+				scene.add(gltf.scene);
+			}, undefined, function (error) {
+				console.error(error);
+			});
+			loader.load("resources/Picker.gltf", function (gltf) {
+				gltf.scene.name = "Picker";
+				gltf.scene.position.x = 17;
+				gltf.scene.position.y = 0.25;
+				gltf.scene.position.z = 20;
+				gltf.scene.castShadow = true;
 				scene.add(gltf.scene);
 			}, undefined, function (error) {
 				console.error(error);
@@ -215,14 +186,31 @@ sap.ui.define([
 			.y = Math.PI;
 		ballMesh.castShadow = true;
 		scene.add(ballMesh);
-		//H	0.6 B	0.35 T	0.40
-		var boxGeometry = new THREE.BoxBufferGeometry(0.58, 0.58, 0.33);
 
 		// Create bin visualization from EWM Masterdata
 		for (var i = 0; i < binData.length; i++) {
 			var obj = binData[i];
+			// Now search the bin type data
+/*			binTypeData = [{
+				"whseNo": "SG01",
+				"binType": "ST01",
+				"maxLength": "0.58",
+				"maxWidth": 0.32,
+				"maxHeight": 0.58,
+				"unit": "M",
+				"texture": "undefined"
+			}];*/
+			var binType;
+			$.each(binTypeData, function (i, v) {
+				if (v.whseNo == obj.whseNo && v.binType == obj.binType) {
+					binType = v; // Found the storage bin type
+					return;
+				}
+			});
+			var boxGeometry = new THREE.BoxBufferGeometry(binType.maxLength, binType.maxHeight, binType.maxWidth);
 			var boxMesh = new THREE.Mesh(boxGeometry, cubeMat);
-			boxMesh.position.set(parseFloat(obj.xC), parseFloat(obj.zC) + 0.25, parseFloat(obj.yC));
+			boxMesh.position.set(parseFloat(obj.xC), parseFloat(obj.zC) + 0.25, parseFloat(
+				obj.yC));
 			boxMesh.castShadow = true;
 			boxMesh.name = obj.binNo;
 			scene.add(boxMesh);
@@ -284,6 +272,52 @@ sap.ui.define([
 		var time = Date.now() * 0.0005;
 		bulbLight.position.y = Math.cos(time) * 0.75 + 1.25;
 		renderer.render(scene, camera);
-		//stats.update();
 	}
+	return Controller.extend("warehouseViewer.warehouseViewer.controller.whseView", {
+		onInit: function () {
+
+			function threejsObjectLoader(parentNode, contentResource) {
+				parentNode.add(contentResource.getSource());
+				return Promise.resolve({
+					node: parentNode,
+					contentResource: contentResource
+				});
+			}
+
+			function threejsContentManagerResolver(contentResource) {
+				if (contentResource.getSource() instanceof THREE.Object3D) {
+					return Promise.resolve({
+						dimension: 3,
+						contentManagerClassName: "sap.ui.vk.threejs.ContentManager",
+						settings: {
+							loader: threejsObjectLoader
+						}
+					});
+				} else {
+					return Promise.reject();
+				}
+			}
+
+			ContentConnector.addContentManagerResolver(threejsContentManagerResolver);
+
+			//Get storage bin data and pass it to the init function
+			var oJSONBins = this.getView().getModel("whseBinsJSON");
+			console.log(oJSONBins.oData.WhseBins);
+			var oJSONBinTypes = this.getView().getModel("whseBinTypesJSON");
+			console.log(oJSONBinTypes.oData.WhseBinTypes);
+
+			// Call the 3D Scene Initialization with the fetched data
+			init(oJSONBins.oData.WhseBins, oJSONBinTypes.oData.WhseBinTypes);
+
+			this.getView().byId("viewer").addContentResource(
+				new ContentResource({
+					source: scene,
+					sourceType: "THREE.Scene",
+					name: "Scene"
+				})
+			);
+
+			//animate();
+		}
+	});
 });

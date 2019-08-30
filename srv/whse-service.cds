@@ -4,7 +4,11 @@ using { whseViz } from '../db/data-model';
 // Provide storage bin data
 service warehouseService {
 	entity Bins @readonly as projection on whseViz.warehouseBins.binTable;
-	entity BinTypes @readonly as projection on whseViz.warehouseBins.binType;
+};
+
+// Provide storage bin type data
+service warehouseBinTypeService {
+	entity BinTypes @readonly as projection on whseViz.warehouseBinTypes.binType;
 };
 
 // Provide resource and location data

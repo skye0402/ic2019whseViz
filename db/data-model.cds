@@ -54,7 +54,9 @@ context warehouseBins {
             zC       : Z_CORD;
             unit     : UOM;
     }
+}
 
+context warehouseBinTypes {
     entity binType {
         key whseNo    : LGNUM;
         key binType   : LPTYP;

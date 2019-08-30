@@ -31,10 +31,6 @@ modules:
           artifacts:
             - './*'
           target-path: resources/warehouseViewer
-        - name: DUMMYV4
-          artifacts:
-            - './*'
-          target-path: resources/DUMMYV4
   - name: warehouseVisualization-db
     type: hdb
     path: db
@@ -62,13 +58,7 @@ modules:
       builder: grunt
       supported-platforms: []
       build-result: dist
-  - name: DUMMYV4
-    type: html5
-    path: DUMMYV4
-    build-parameters:
-      builder: grunt
-      supported-platforms: []
-      build-result: dist
+  
 resources:
   - name: warehouseVisualization_html5_repo_runtime
     parameters:

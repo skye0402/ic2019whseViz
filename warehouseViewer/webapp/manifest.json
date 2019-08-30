@@ -22,6 +22,14 @@
 					"localUri": "localService/metadata.xml"
 				}
 			},
+			"warehouseBinTypeService": {
+				"uri": "/srv_api/warehouse-bin-type/",
+				"type": "OData",
+				"settings": {
+					"odataVersion": "4.0",
+					"localUri": "localService/metadata.xml"
+				}
+			},
 			"resourceService": {
 				"uri": "/srv_api/resource/",
 				"type": "OData",
@@ -84,9 +92,23 @@
 					"autoExpandSelect": true
 				},
 				"dataSource": "warehouseService",
-				"preload": true
+				"preload": false
+			},
+			"warehouseBinTypes": {
+				"type": "sap.ui.model.odata.v4.ODataModel",
+				"settings": {
+					"operationMode": "Server",
+					"synchronizationMode": "None",
+					"groupId": "$auto",
+					"autoExpandSelect": true
+				},
+				"dataSource": "warehouseBinTypeService",
+				"preload": false
 			},
 			"whseBinsJSON": {
+				"type": "sap.ui.model.json.JSONModel"
+			},
+			"whseBinTypesJSON": {
 				"type": "sap.ui.model.json.JSONModel"
 			},
 			"resourceData": {

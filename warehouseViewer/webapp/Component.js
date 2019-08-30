@@ -25,16 +25,18 @@ sap.ui.define([
 
 			// set the device model
 			this.setModel(models.createDeviceModel(), "device");
-
+			
+			// Prepare the OData Model for storage bins
 			var oModel = this.getModel("warehouseBins"),
 				bRefreshed;
 			var oListBinding = oModel.bindList("/Bins", undefined, undefined, undefined, {
-				$select: "whseBin"
+				$select: "whseNo"
 			});
+			
 			var oJSONModel = this.getModel("whseBinsJSON");
 			
-			function handleChange(oEvent) {
-				var aContexts = oListBinding.getContexts(0, 300), //get first 10 entries
+			function handleChangeB(oEvent) {
+				var aContexts = oListBinding.getContexts(0, 300), //get first 300 entries
 					oData;
 				if (bRefreshed) {
 					oData = {
@@ -42,15 +44,42 @@ sap.ui.define([
 					};
 					oJSONModel.setData(oData);
 				} else {
-					oListBinding.attachEventOnce("change", handleChange);
+					oListBinding.attachEventOnce("change", handleChangeB);
 				}
 			}
 
 			oListBinding.getContexts(0, 300);
-			oListBinding.attachEventOnce("change", handleChange);
+			oListBinding.attachEventOnce("change", handleChangeB);
 			oListBinding.attachEventOnce("refresh", function (oEvent) {
 				oListBinding.getContexts(0, 300);
 				bRefreshed = true;
+			});
+			
+			// Prepare the OData Model for storage bin types
+			var oModelT = this.getModel("warehouseBinTypes"),
+				bRefreshedT;
+			var oListBindingT = oModelT.bindList("/BinTypes", undefined, undefined, undefined, {
+				$select: "whseNo"
+			});
+			var oJSONBinTypes = this.getModel("whseBinTypesJSON");
+
+			function handleChangeT(oEvent) {
+				var aContexts = oListBindingT.getContexts(0, 10), //get first 10 entries
+					oData;
+				if (bRefreshedT) {
+					oData = {
+						WhseBinTypes: aContexts.map(oContext => oContext.getObject())
+					};
+					oJSONBinTypes.setData(oData);
+				} else {
+					oListBindingT.attachEventOnce("change", handleChangeT);
+				}
+			}
+			oListBindingT.getContexts(0, 10);
+			oListBindingT.attachEventOnce("change", handleChangeT);
+			oListBindingT.attachEventOnce("refresh", function (oEvent) {
+				oListBindingT.getContexts(0, 10);
+				bRefreshedT = true;
 			});
 		}
 	});
