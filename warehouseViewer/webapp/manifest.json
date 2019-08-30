@@ -21,6 +21,14 @@
 					"odataVersion": "4.0",
 					"localUri": "localService/metadata.xml"
 				}
+			},
+			"resourceService": {
+				"uri": "/srv_api/resource/",
+				"type": "OData",
+				"settings": {
+					"odataVersion": "4.0",
+					"localUri": "localService/metadata.xml"
+				}
 			}
 		}
 	},
@@ -80,6 +88,17 @@
 			},
 			"whseBinsJSON": {
 				"type": "sap.ui.model.json.JSONModel"
+			},
+			"resourceData": {
+				"type": "sap.ui.model.odata.v4.ODataModel",
+				"settings": {
+					"operationMode": "Server",
+					"synchronizationMode": "None",
+					"groupId": "$auto",
+					"autoExpandSelect": true
+				},
+				"dataSource": "resourceService",
+				"preload": true
 			}
 		},
 		"resources": {

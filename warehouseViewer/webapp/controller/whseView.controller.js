@@ -9,8 +9,7 @@ sap.ui.define([
 	"use strict";
 
 	// ----------- Threejs functions and variables ------------------
-	var camera, scene, renderer,
-		hemiLight, stats;
+	var camera, scene, renderer, hemiLight;
 	var ballMat, cubeMat, floorMat;
 	// ref for lumens: http://www.power-sure.com/lumens.htm
 	var bulbLuminousPowers = {
@@ -73,7 +72,7 @@ sap.ui.define([
 
 			ContentConnector.addContentManagerResolver(threejsContentManagerResolver);
 
-			//			Get storage bin data and pass it to the init function
+			//Get storage bin data and pass it to the init function
 			var oJSONModel = this.getView().getModel("whseBinsJSON");
 			init(oJSONModel.oData.WhseBins);
 
@@ -97,12 +96,27 @@ sap.ui.define([
 		scene = new THREE.Scene();
 		scene.name = "Warehouse";
 
+		// Load models
+		var url = "https://threejs.org/examples/js/loaders/GLTFLoader.js";
+
+		jQuery.ajax({
+			url: url,
+			dataType: "script",
+			cache: true
+		}).done(function () {
+			var loader = new THREE.GLTFLoader();
+			loader.load('resources/Forklift.gltf', function (gltf) {
+				gltf.name = "Forklift";
+				scene.add(gltf.scene);
+			}, undefined, function (error) {
+				console.error(error);
+			});
+		});
 		// create ceiling lights
-		
 		for (var i = 1; i < 4; i++) {
 			var bulbGeometry = new THREE.SphereBufferGeometry(0.02, 16, 8);
 			var bulbLight = new THREE.PointLight(0xffee88, 1, 100, 2);
-			bulbLight.name = "Warehouse Light " + toString(i);
+			bulbLight.name = "Warehouse Light ".concat(i.toString());
 			var bulbMat = new THREE.MeshStandardMaterial({
 				emissive: 0xffffee,
 				emissiveIntensity: 1,
@@ -117,12 +131,13 @@ sap.ui.define([
 		hemiLight = new THREE.HemisphereLight(0xddeeff, 0x0f0e0d, 0.02);
 		hemiLight.name = "Surrounding light";
 		scene.add(hemiLight);
-		floorMat = new THREE.MeshStandardMaterial({
-			roughness: 0.8,
-			color: 0xffffff,
-			metalness: 0.2,
-			bumpScale: 0.0005
-		});
+		floorMat =
+			new THREE.MeshStandardMaterial({
+				roughness: 0.8,
+				color: 0xffffff,
+				metalness: 0.2,
+				bumpScale: 0.0005
+			});
 		var textureLoader = new THREE.TextureLoader();
 		textureLoader.load("textures/hardwood2_diffuse.jpg", function (map) {
 			map.wrapS = THREE.RepeatWrapping;
@@ -189,13 +204,15 @@ sap.ui.define([
 		var floorMesh = new THREE.Mesh(floorGeometry, floorMat);
 		floorMesh.name = "Floor mesh";
 		floorMesh.receiveShadow = true;
-		floorMesh.rotation.x = -Math.PI / 2.0;
+		floorMesh.rotation
+			.x = -Math.PI / 2.0;
 		scene.add(floorMesh);
 		var ballGeometry = new THREE.SphereBufferGeometry(0.25, 32, 32);
 		var ballMesh = new THREE.Mesh(ballGeometry, ballMat);
 		ballMesh.name = "Globe Model";
 		ballMesh.position.set(1, 0.25, 1);
-		ballMesh.rotation.y = Math.PI;
+		ballMesh.rotation
+			.y = Math.PI;
 		ballMesh.castShadow = true;
 		scene.add(ballMesh);
 		//H	0.6 B	0.35 T	0.40
@@ -214,11 +231,13 @@ sap.ui.define([
 		renderer = new THREE.WebGLRenderer();
 		renderer.physicallyCorrectLights = true;
 		renderer.gammaInput = true;
-		renderer.gammaOutput = true;
+		renderer.gammaOutput =
+			true;
 		renderer.shadowMap.enabled = true;
 		renderer.toneMapping = THREE.ReinhardToneMapping;
 		renderer.setPixelRatio(window.devicePixelRatio);
-		renderer.setSize(800, 500); //---TODO get size of available window for 3D
+		renderer
+			.setSize(800, 500); //---TODO get size of available window for 3D
 		/*container.appendChild(renderer.domElement);
 		var controls = new OrbitControls(camera, renderer.domElement);
 		window.addEventListener('resize', onWindowResize, false);
