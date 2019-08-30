@@ -1,0 +1,3 @@
+WHSENO,RSRCTYPE,DESCR,MODEL3D
+SG01,FL01,Forklift for warehouse,Forklift.gltf
+SG01,PICK,Picking resource (human),Picker.gltf
