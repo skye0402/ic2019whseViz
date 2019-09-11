@@ -241,10 +241,12 @@ sap.ui.define([
 	//--- Does the animation
 	function render() {
 		var forklift =  threejsScene.getObjectByName("Forklift");
-		var time = Date.now() * 0.0005;
-		forklift.position.x = Math.cos(time) * 1.5 + 1.25;
-		renderer.render(scene, camera);
-		viewerReference.getViewport().setShouldRenderFrame(); // Updates the SAP viewport
+		if (forklift !== undefined){
+			var time = Date.now() * 0.0005;
+			forklift.position.x = Math.cos(time) * 1.5 + 1.25;
+			renderer.render(scene, camera);
+			viewerReference.getViewport().setShouldRenderFrame(); // Updates the SAP viewport
+		}
 	}
 	
 	//--- Manages the animation
