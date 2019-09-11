@@ -10,7 +10,7 @@ sap.ui.define([
 
 	// ----------- Threejs functions and variables ------------------
 	var camera, scene, renderer, hemiLight;
-	var ballMat, cubeMat, floorMat;
+	var bulbMat, ballMat, cubeMat, floorMat;
 	// ref for lumens: http://www.power-sure.com/lumens.htm
 	var bulbLuminousPowers = {
 		"110000 lm (1000W)": 110000,
@@ -44,7 +44,10 @@ sap.ui.define([
 	};
 
 	var previousShadowMap = false;
-
+	
+	var threejsScene; // Used to take the reference to the scene
+	var viewerReference; // Reference to the viewer
+	
 	function init(binData, binTypeData) {
 		camera = new THREE.PerspectiveCamera(50, 1.6, 0.1, 100); //----TODO Must adjust the ratio dynamically!
 		camera.position.x = -4;
@@ -65,7 +68,7 @@ sap.ui.define([
 			loader.load("resources/Forklift.gltf", function (gltf) {
 				gltf.scene.name = "Forklift";
 				gltf.scene.position.x = 15;
-				gltf.scene.position.y = 0.25;
+				gltf.scene.position.y = 0;
 				gltf.scene.position.z = 24;
 				gltf.scene.castShadow = true;
 				scene.add(gltf.scene);
@@ -75,7 +78,7 @@ sap.ui.define([
 			loader.load("resources/Picker.gltf", function (gltf) {
 				gltf.scene.name = "Picker";
 				gltf.scene.position.x = 17;
-				gltf.scene.position.y = 0.25;
+				gltf.scene.position.y = 0;
 				gltf.scene.position.z = 20;
 				gltf.scene.castShadow = true;
 				scene.add(gltf.scene);
@@ -88,7 +91,7 @@ sap.ui.define([
 			var bulbGeometry = new THREE.SphereBufferGeometry(0.02, 16, 8);
 			var bulbLight = new THREE.PointLight(0xffee88, 1, 100, 2);
 			bulbLight.name = "Warehouse Light ".concat(i.toString());
-			var bulbMat = new THREE.MeshStandardMaterial({
+			bulbMat = new THREE.MeshStandardMaterial({
 				emissive: 0xffffee,
 				emissiveIntensity: 1,
 				color: 0x000000
@@ -191,15 +194,15 @@ sap.ui.define([
 		for (var i = 0; i < binData.length; i++) {
 			var obj = binData[i];
 			// Now search the bin type data
-/*			binTypeData = [{
-				"whseNo": "SG01",
-				"binType": "ST01",
-				"maxLength": "0.58",
-				"maxWidth": 0.32,
-				"maxHeight": 0.58,
-				"unit": "M",
-				"texture": "undefined"
-			}];*/
+			/*			binTypeData = [{
+							"whseNo": "SG01",
+							"binType": "ST01",
+							"maxLength": "0.58",
+							"maxWidth": 0.32,
+							"maxHeight": 0.58,
+							"unit": "M",
+							"texture": "undefined"
+						}];*/
 			var binType;
 			$.each(binTypeData, function (i, v) {
 				if (v.whseNo == obj.whseNo && v.binType == obj.binType) {
@@ -219,13 +222,11 @@ sap.ui.define([
 		renderer = new THREE.WebGLRenderer();
 		renderer.physicallyCorrectLights = true;
 		renderer.gammaInput = true;
-		renderer.gammaOutput =
-			true;
+		renderer.gammaOutput = true;
 		renderer.shadowMap.enabled = true;
 		renderer.toneMapping = THREE.ReinhardToneMapping;
 		renderer.setPixelRatio(window.devicePixelRatio);
-		renderer
-			.setSize(800, 500); //---TODO get size of available window for 3D
+		renderer.setSize(800, 500); //---TODO get size of available window for 3D
 		/*container.appendChild(renderer.domElement);
 		var controls = new OrbitControls(camera, renderer.domElement);
 		window.addEventListener('resize', onWindowResize, false);
@@ -236,46 +237,25 @@ sap.ui.define([
 		gui.add(params, 'shadows');
 		gui.open();*/
 	}
-
-	/*	function initObject(obj, name, posX, posY, posZ, id) {
-			obj.name = name;
-			obj.position.set(posX, posY, posZ);
-			obj.userData.treeNode = {
-				sid: id
-			};
-		}*/
-
-	/*	function onWindowResize() {
-			camera.aspect = window.innerWidth / window.innerHeight;
-			camera.updateProjectionMatrix();
-			renderer.setSize(window.innerWidth, window.innerHeight);
-		}*/
-	//
+	
+	//--- Does the animation
+	function render() {
+		var forklift =  threejsScene.getObjectByName("Forklift");
+		var time = Date.now() * 0.0005;
+		forklift.position.x = Math.cos(time) * 1.5 + 1.25;
+		renderer.render(scene, camera);
+		viewerReference.getViewport().setShouldRenderFrame(); // Updates the SAP viewport
+	}
+	
+	//--- Manages the animation
 	function animate() {
+		// Recursive call of the animate function whenever the browser is ready (battery-friendly)
 		requestAnimationFrame(animate);
 		render();
 	}
-
-	function render() {
-		renderer.toneMappingExposure = Math.pow(params.exposure, 5.0); // to allow for very bright scenes.
-		renderer.shadowMap.enabled = params.shadows;
-		bulbLight.castShadow = params.shadows;
-		if (params.shadows !== previousShadowMap) {
-			ballMat.needsUpdate = true;
-			cubeMat.needsUpdate = true;
-			floorMat.needsUpdate = true;
-			previousShadowMap = params.shadows;
-		}
-		bulbLight.power = bulbLuminousPowers[params.bulbPower];
-		bulbMat.emissiveIntensity = bulbLight.intensity / Math.pow(0.02, 2.0); // convert from intensity to irradiance at bulb surface
-		hemiLight.intensity = hemiLuminousIrradiances[params.hemiIrradiance];
-		var time = Date.now() * 0.0005;
-		bulbLight.position.y = Math.cos(time) * 0.75 + 1.25;
-		renderer.render(scene, camera);
-	}
+	
 	return Controller.extend("warehouseViewer.warehouseViewer.controller.whseView", {
 		onInit: function () {
-
 			function threejsObjectLoader(parentNode, contentResource) {
 				parentNode.add(contentResource.getSource());
 				return Promise.resolve({
@@ -302,12 +282,16 @@ sap.ui.define([
 
 			//Get storage bin data and pass it to the init function
 			var oJSONBins = this.getView().getModel("whseBinsJSON");
-			console.log(oJSONBins.oData.WhseBins);
 			var oJSONBinTypes = this.getView().getModel("whseBinTypesJSON");
-			console.log(oJSONBinTypes.oData.WhseBinTypes);
-
+			viewerReference = this.getView().byId("viewer");
 			// Call the 3D Scene Initialization with the fetched data
 			init(oJSONBins.oData.WhseBins, oJSONBinTypes.oData.WhseBinTypes);
+
+		viewerReference.attachSceneLoadingSucceeded(function (oEvent) {
+				// Contains the reference to the scene
+				threejsScene = oEvent.getParameter("scene").getSceneRef();
+				animate();
+			});
 
 			this.getView().byId("viewer").addContentResource(
 				new ContentResource({
@@ -316,8 +300,11 @@ sap.ui.define([
 					name: "Scene"
 				})
 			);
+		},
 
-			//animate();
+		// Called every time the view is rendered again
+		onBeforeRendering: function () {
+			var threejsContent = this.getView().byId("viewer").getContentResources(); //TODO test only
 		}
 	});
 });

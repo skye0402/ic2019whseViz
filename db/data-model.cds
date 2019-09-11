@@ -29,9 +29,11 @@ type MAX_HEIGHT : Decimal(15, 2); // Height
 type TAGIDENTIFIER : String(4); // Technical tag ID from RTLS
 type METRICCOORDINATE : Integer; // Coordidates from RTLS in meters
 type QUALITYOFLOCATION : Integer; // Quality indicator of location from 0..100
-type RSRC : String(18); // Resource name from EWM
+type RSRC      : String(18); // Resource name from EWM
 type RSRC_TYPE : String(4); // Resource type from EWM
 type TEXTDATA  : String(40); // Resource description
+type ANGLE	   : Integer; // Orientation of resource (facing direction)
+type TSTAMP    : Timestamp; // Time stamp of entry
 
 @OData.publish : true
 // All around warehouse storage bins
@@ -78,7 +80,17 @@ context whseResources {
                 z       : METRICCOORDINATE;
                 quality : QUALITYOFLOCATION;
         };
-
+        
+        // Streamed data from RTLS with timestamp
+        entity rtlsTagDataStream {
+        	key tStamp  : TSTAMP;
+        	key tagID	: TAGIDENTIFIER;
+                x       : METRICCOORDINATE;
+                y       : METRICCOORDINATE;
+                z       : METRICCOORDINATE;
+                quality : QUALITYOFLOCATION;
+		};
+		
         // Used from the EWM Data model defining resource characteristics
         entity resourceType {
             key whseNo   : LGNUM;
@@ -111,4 +123,7 @@ context whseResources {
 	        	rD.y / 1000 as y : Decimal(15,2), 
 	        	rD.z / 1000 as z : Decimal(15,2)
         	};
+        // Combined view on resource data stream
+
+        	
 };
