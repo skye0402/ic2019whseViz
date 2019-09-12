@@ -44,10 +44,10 @@ sap.ui.define([
 	};
 
 	var previousShadowMap = false;
-	
+
 	var threejsScene; // Used to take the reference to the scene
 	var viewerReference; // Reference to the viewer
-	
+
 	function init(binData, binTypeData) {
 		camera = new THREE.PerspectiveCamera(50, 1.6, 0.1, 100); //----TODO Must adjust the ratio dynamically!
 		camera.position.x = -4;
@@ -66,16 +66,25 @@ sap.ui.define([
 		}).done(function () {
 			var loader = new THREE.GLTFLoader();
 			loader.load("resources/Forklift.gltf", function (gltf) {
+				gltf.scene.traverse(function (node) {
+					if (node instanceof THREE.Mesh) {
+						node.castShadow = true;
+					}
+				});
 				gltf.scene.name = "Forklift";
 				gltf.scene.position.x = 15;
 				gltf.scene.position.y = 0;
 				gltf.scene.position.z = 24;
-				gltf.scene.castShadow = true;
 				scene.add(gltf.scene);
 			}, undefined, function (error) {
 				console.error(error);
 			});
 			loader.load("resources/Picker.gltf", function (gltf) {
+				gltf.scene.traverse(function (node) {
+					if (node instanceof THREE.Mesh) {
+						node.castShadow = true;
+					}
+				});
 				gltf.scene.name = "Picker";
 				gltf.scene.position.x = 17;
 				gltf.scene.position.y = 0;
@@ -226,36 +235,30 @@ sap.ui.define([
 		renderer.shadowMap.enabled = true;
 		renderer.toneMapping = THREE.ReinhardToneMapping;
 		renderer.setPixelRatio(window.devicePixelRatio);
-		renderer.setSize(800, 500); //---TODO get size of available window for 3D
-		/*container.appendChild(renderer.domElement);
-		var controls = new OrbitControls(camera, renderer.domElement);
-		window.addEventListener('resize', onWindowResize, false);
-		var gui = new GUI();
-		gui.add(params, 'hemiIrradiance', Object.keys(hemiLuminousIrradiances));
-		gui.add(params, 'bulbPower', Object.keys(bulbLuminousPowers));
-		gui.add(params, 'exposure', 0, 1);
-		gui.add(params, 'shadows');
-		gui.open();*/
 	}
-	
+
 	//--- Does the animation
 	function render() {
-		var forklift =  threejsScene.getObjectByName("Forklift");
-		if (forklift !== undefined){
+
+		renderer.toneMappingExposure = Math.pow(params.exposure, 5.0); // to allow for very bright scenes.
+		renderer.shadowMap.enabled = params.shadows;
+
+		var forklift = threejsScene.getObjectByName("Forklift");
+		if (forklift !== undefined) {
 			var time = Date.now() * 0.0005;
 			forklift.position.x = Math.cos(time) * 1.5 + 1.25;
 			renderer.render(scene, camera);
 			viewerReference.getViewport().setShouldRenderFrame(); // Updates the SAP viewport
 		}
 	}
-	
+
 	//--- Manages the animation
 	function animate() {
 		// Recursive call of the animate function whenever the browser is ready (battery-friendly)
 		requestAnimationFrame(animate);
 		render();
 	}
-	
+
 	return Controller.extend("warehouseViewer.warehouseViewer.controller.whseView", {
 		onInit: function () {
 			function threejsObjectLoader(parentNode, contentResource) {
@@ -289,7 +292,7 @@ sap.ui.define([
 			// Call the 3D Scene Initialization with the fetched data
 			init(oJSONBins.oData.WhseBins, oJSONBinTypes.oData.WhseBinTypes);
 
-		viewerReference.attachSceneLoadingSucceeded(function (oEvent) {
+			viewerReference.attachSceneLoadingSucceeded(function (oEvent) {
 				// Contains the reference to the scene
 				threejsScene = oEvent.getParameter("scene").getSceneRef();
 				animate();
