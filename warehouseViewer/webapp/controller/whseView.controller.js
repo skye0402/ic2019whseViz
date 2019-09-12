@@ -8,42 +8,17 @@ sap.ui.define([
 ], function (Controller, MessageToast, ContentResource, ContentConnector, threejs, ODataModel) {
 	"use strict";
 
+	// ----------- Get i18n model -----------------------------------
+	var oResourceBundle;
+
 	// ----------- Threejs functions and variables ------------------
 	var camera, scene, renderer, hemiLight;
 	var bulbMat, ballMat, cubeMat, floorMat;
-	// ref for lumens: http://www.power-sure.com/lumens.htm
-	var bulbLuminousPowers = {
-		"110000 lm (1000W)": 110000,
-		"3500 lm (300W)": 3500,
-		"1700 lm (100W)": 1700,
-		"800 lm (60W)": 800,
-		"400 lm (40W)": 400,
-		"180 lm (25W)": 180,
-		"20 lm (4W)": 20,
-		"Off": 0
-	};
-	// ref for solar irradiances: https://en.wikipedia.org/wiki/Lux
-	var hemiLuminousIrradiances = {
-		"0.0001 lx (Moonless Night)": 0.0001,
-		"0.002 lx (Night Airglow)": 0.002,
-		"0.5 lx (Full Moon)": 0.5,
-		"3.4 lx (City Twilight)": 3.4,
-		"50 lx (Living Room)": 50,
-		"100 lx (Very Overcast)": 100,
-		"350 lx (Office Room)": 350,
-		"400 lx (Sunrise/Sunset)": 400,
-		"1000 lx (Overcast)": 1000,
-		"18000 lx (Daylight)": 18000,
-		"50000 lx (Direct Sun)": 50000
-	};
+
 	var params = {
 		shadows: true,
-		exposure: 0.68,
-		bulbPower: Object.keys(bulbLuminousPowers)[4],
-		hemiIrradiance: Object.keys(hemiLuminousIrradiances)[0]
+		exposure: 0.68
 	};
-
-	var previousShadowMap = false;
 
 	var threejsScene; // Used to take the reference to the scene
 	var viewerReference; // Reference to the viewer
@@ -56,11 +31,10 @@ sap.ui.define([
 		scene = new THREE.Scene();
 		scene.name = "Warehouse";
 
-		// Load 3D models
-		var url = "https://threejs.org/examples/js/loaders/GLTFLoader.js";
-
+		// Load 3D models asynchronous
+		var gltfLoaderURL = oResourceBundle.getText("gltfLoaderURL").toString().trim();
 		jQuery.ajax({
-			url: url,
+			url: gltfLoaderURL,
 			dataType: "script",
 			cache: true
 		}).done(function () {
@@ -95,6 +69,7 @@ sap.ui.define([
 				console.error(error);
 			});
 		});
+		
 		// create ceiling lights
 		for (var i = 1; i < 4; i++) {
 			var bulbGeometry = new THREE.SphereBufferGeometry(0.02, 16, 8);
@@ -168,21 +143,7 @@ sap.ui.define([
 			cubeMat.bumpMap = map;
 			cubeMat.needsUpdate = true;
 		});
-		ballMat = new THREE.MeshStandardMaterial({
-			color: 0xffffff,
-			roughness: 0.5,
-			metalness: 1.0
-		});
-		textureLoader.load("textures/earth_atmos_2048.jpg", function (map) {
-			map.anisotropy = 4;
-			ballMat.map = map;
-			ballMat.needsUpdate = true;
-		});
-		textureLoader.load("textures/earth_specular_2048.jpg", function (map) {
-			map.anisotropy = 4;
-			ballMat.metalnessMap = map;
-			ballMat.needsUpdate = true;
-		});
+
 		var floorGeometry = new THREE.PlaneBufferGeometry(100, 80);
 		var floorMesh = new THREE.Mesh(floorGeometry, floorMat);
 		floorMesh.name = "Floor mesh";
@@ -190,17 +151,9 @@ sap.ui.define([
 		floorMesh.rotation
 			.x = -Math.PI / 2.0;
 		scene.add(floorMesh);
-		var ballGeometry = new THREE.SphereBufferGeometry(0.25, 32, 32);
-		var ballMesh = new THREE.Mesh(ballGeometry, ballMat);
-		ballMesh.name = "Globe Model";
-		ballMesh.position.set(1, 0.25, 1);
-		ballMesh.rotation
-			.y = Math.PI;
-		ballMesh.castShadow = true;
-		scene.add(ballMesh);
 
 		// Create bin visualization from EWM Masterdata
-		for (var i = 0; i < binData.length; i++) {
+		for (i = 0; i < binData.length; i++) {
 			var obj = binData[i];
 			// Now search the bin type data
 			/*			binTypeData = [{
@@ -268,7 +221,7 @@ sap.ui.define([
 					contentResource: contentResource
 				});
 			}
-
+			
 			function threejsContentManagerResolver(contentResource) {
 				if (contentResource.getSource() instanceof THREE.Object3D) {
 					return Promise.resolve({
@@ -282,7 +235,9 @@ sap.ui.define([
 					return Promise.reject();
 				}
 			}
-
+			// Create reference to i18n model
+			oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
+			
 			ContentConnector.addContentManagerResolver(threejsContentManagerResolver);
 
 			//Get storage bin data and pass it to the init function
