@@ -127,7 +127,8 @@ sap.ui.define([
 			bumpScale: 0.002,
 			metalness: 0.2
 		});
-		textureLoader.load("textures/brick_diffuse.jpg", function (map) {
+		//changed the texture of bins
+		textureLoader.load("textures/white_plastic_fence_boards_texture.jpg", function (map) {
 			map.wrapS = THREE.RepeatWrapping;
 			map.wrapT = THREE.RepeatWrapping;
 			map.anisotropy = 4;
@@ -135,14 +136,14 @@ sap.ui.define([
 			cubeMat.map = map;
 			cubeMat.needsUpdate = true;
 		});
-		textureLoader.load("textures/brick_bump.jpg", function (map) {
-			map.wrapS = THREE.RepeatWrapping;
-			map.wrapT = THREE.RepeatWrapping;
-			map.anisotropy = 4;
-			map.repeat.set(1, 1);
-			cubeMat.bumpMap = map;
-			cubeMat.needsUpdate = true;
-		});
+		// textureLoader.load("textures/brick_bump.jpg", function (map) {
+		// 	map.wrapS = THREE.RepeatWrapping;
+		// 	map.wrapT = THREE.RepeatWrapping;
+		// 	map.anisotropy = 4;
+		// 	map.repeat.set(1, 1);
+		// 	cubeMat.bumpMap = map;
+		// 	cubeMat.needsUpdate = true;
+		// });
 
 		var floorGeometry = new THREE.PlaneBufferGeometry(100, 80);
 		var floorMesh = new THREE.Mesh(floorGeometry, floorMat);
@@ -172,6 +173,8 @@ sap.ui.define([
 					return;
 				}
 			});
+			//To change the vizualization of bins, 
+			//just replaced the content of "WHSEVIZ_WAREHOUSEBINS_BINTABLE" with the testdata "WHSEVIZ_WAREHOUSEBINS_BINTABLE.hdbdata"
 			var boxGeometry = new THREE.BoxBufferGeometry(binType.maxLength, binType.maxHeight, binType.maxWidth);
 			var boxMesh = new THREE.Mesh(boxGeometry, cubeMat);
 			boxMesh.position.set(parseFloat(obj.xC), parseFloat(obj.zC) + 0.25, parseFloat(
