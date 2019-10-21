@@ -30,7 +30,7 @@ sap.ui.define([
 		camera.position.y = 2;
 		scene = new THREE.Scene();
 		scene.name = "Warehouse";
-
+		
 		// Load 3D models asynchronous
 		var gltfLoaderURL = oResourceBundle.getText("gltfLoaderURL").toString().trim();
 		jQuery.ajax({
