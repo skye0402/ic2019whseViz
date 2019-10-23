@@ -22,6 +22,16 @@ sap.ui.define([
 
 	var threejsScene; // Used to take the reference to the scene
 	var viewerReference; // Reference to the viewer
+	
+	// Not nice but only called if the data is not yet loaded
+	function sleep(milliseconds) {
+		var start = new Date().getTime();
+		for (var i = 0; i < 1e7; i++) {
+			if ((new Date().getTime() - start) > milliseconds) {
+				break;
+			}
+		}
+	}
 
 	function init(binData, binTypeData) {
 		camera = new THREE.PerspectiveCamera(50, 1.6, 0.1, 100); //----TODO Must adjust the ratio dynamically!
@@ -30,7 +40,7 @@ sap.ui.define([
 		camera.position.y = 2;
 		scene = new THREE.Scene();
 		scene.name = "Warehouse";
-		
+
 		// Load 3D models asynchronous
 		var gltfLoaderURL = oResourceBundle.getText("gltfLoaderURL").toString().trim();
 		jQuery.ajax({
@@ -69,7 +79,7 @@ sap.ui.define([
 				console.error(error);
 			});
 		});
-		
+
 		// create ceiling lights
 		for (var i = 1; i < 4; i++) {
 			var bulbGeometry = new THREE.SphereBufferGeometry(0.02, 16, 8);
@@ -153,6 +163,10 @@ sap.ui.define([
 			.x = -Math.PI / 2.0;
 		scene.add(floorMesh);
 
+		// Check if the data is loaded from OData Model
+		if (binData === undefined){
+			sleep(1000); // Yea, this is not nice...
+		}
 		// Create bin visualization from EWM Masterdata
 		for (i = 0; i < binData.length; i++) {
 			var obj = binData[i];
@@ -177,8 +191,7 @@ sap.ui.define([
 			//just replaced the content of "WHSEVIZ_WAREHOUSEBINS_BINTABLE" with the testdata "WHSEVIZ_WAREHOUSEBINS_BINTABLE.hdbdata"
 			var boxGeometry = new THREE.BoxBufferGeometry(binType.maxLength, binType.maxHeight, binType.maxWidth);
 			var boxMesh = new THREE.Mesh(boxGeometry, cubeMat);
-			boxMesh.position.set(parseFloat(obj.xC), parseFloat(obj.zC) + 0.25, parseFloat(
-				obj.yC));
+			boxMesh.position.set(parseFloat(obj.xC), parseFloat(obj.zC) + 0.25, parseFloat(obj.yC));
 			boxMesh.castShadow = true;
 			boxMesh.name = obj.binNo;
 			scene.add(boxMesh);
@@ -203,9 +216,17 @@ sap.ui.define([
 		if (forklift !== undefined) {
 			var time = Date.now() * 0.0005;
 			forklift.position.x = Math.cos(time) * 1.5 + 1.25;
-			renderer.render(scene, camera);
-			viewerReference.getViewport().setShouldRenderFrame(); // Updates the SAP viewport
+			forklift.rotation.y = Math.PI / 2 * time;
 		}
+
+		var picker = threejsScene.getObjectByName("Picker");
+		if (picker !== undefined) {
+			//var time = Date.now() * 0.0005;
+			picker.position.z = Math.cos(time) * 1.5 + 1.25;
+			picker.rotation.y = Math.PI / 2 * time;
+		}
+		renderer.render(scene, camera);
+		viewerReference.getViewport().setShouldRenderFrame(); // Updates the SAP viewport
 	}
 
 	//--- Manages the animation
@@ -224,7 +245,7 @@ sap.ui.define([
 					contentResource: contentResource
 				});
 			}
-			
+
 			function threejsContentManagerResolver(contentResource) {
 				if (contentResource.getSource() instanceof THREE.Object3D) {
 					return Promise.resolve({
@@ -240,7 +261,7 @@ sap.ui.define([
 			}
 			// Create reference to i18n model
 			oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
-			
+
 			ContentConnector.addContentManagerResolver(threejsContentManagerResolver);
 
 			//Get storage bin data and pass it to the init function
