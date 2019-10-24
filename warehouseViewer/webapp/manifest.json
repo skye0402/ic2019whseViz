@@ -111,6 +111,9 @@
 			"whseBinTypesJSON": {
 				"type": "sap.ui.model.json.JSONModel"
 			},
+			"whseResourcesJSON": {
+				"type": "sap.ui.model.json.JSONModel"
+			},
 			"resourceData": {
 				"type": "sap.ui.model.odata.v4.ODataModel",
 				"settings": {

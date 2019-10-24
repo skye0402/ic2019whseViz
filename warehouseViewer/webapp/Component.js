@@ -36,7 +36,7 @@ sap.ui.define([
 			var oJSONModel = this.getModel("whseBinsJSON");
 			
 			function handleChangeB(oEvent) {
-				var aContexts = oListBinding.getContexts(0, 300), //get first 300 entries
+				var aContexts = oListBinding.getContexts(0, Infinity), //get all bin entries
 					oData;
 				if (bRefreshed) {
 					oData = {
@@ -48,10 +48,10 @@ sap.ui.define([
 				}
 			}
 
-			oListBinding.getContexts(0, 300);
+			oListBinding.getContexts(0, Infinity);
 			oListBinding.attachEventOnce("change", handleChangeB);
 			oListBinding.attachEventOnce("refresh", function (oEvent) {
-				oListBinding.getContexts(0, 300);
+				oListBinding.getContexts(0, Infinity);
 				bRefreshed = true;
 			});
 			
@@ -64,7 +64,7 @@ sap.ui.define([
 			var oJSONBinTypes = this.getModel("whseBinTypesJSON");
 
 			function handleChangeT(oEvent) {
-				var aContexts = oListBindingT.getContexts(0, 10), //get first 10 entries
+				var aContexts = oListBindingT.getContexts(0, Infinity), //get all entries
 					oData;
 				if (bRefreshedT) {
 					oData = {
@@ -75,10 +75,10 @@ sap.ui.define([
 					oListBindingT.attachEventOnce("change", handleChangeT);
 				}
 			}
-			oListBindingT.getContexts(0, 10);
+			oListBindingT.getContexts(0, Infinity);
 			oListBindingT.attachEventOnce("change", handleChangeT);
 			oListBindingT.attachEventOnce("refresh", function (oEvent) {
-				oListBindingT.getContexts(0, 10);
+				oListBindingT.getContexts(0, Infinity);
 				bRefreshedT = true;
 			});
 		}

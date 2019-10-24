@@ -6,10 +6,16 @@ sap.ui.define([
 	"sap/ui/vk/threejs/thirdparty/three",
 	"sap/ui/model/odata/v4/ODataModel"
 ], function (Controller, MessageToast, ContentResource, ContentConnector, threejs, ODataModel) {
-	"use strict";
+	//"use strict";
 
 	// ----------- Get i18n model -----------------------------------
 	var oResourceBundle;
+	// ----------- Resources and their location----------------------
+	var oPromiseContexts;
+	var oJSONResources;
+	var oListBindingResources;
+	var oModelResources;
+	var bRequestComplete = true;
 
 	// ----------- Threejs functions and variables ------------------
 	var camera, scene, renderer, hemiLight;
@@ -20,9 +26,9 @@ sap.ui.define([
 		exposure: 0.68
 	};
 
-	var threejsScene; // Used to take the reference to the scene
-	var viewerReference; // Reference to the viewer
-	
+	var oThreejsScene; // Used to take the reference to the scene
+	var oViewerReference; // Reference to the viewer
+
 	// Not nice but only called if the data is not yet loaded
 	function sleep(milliseconds) {
 		var start = new Date().getTime();
@@ -164,7 +170,7 @@ sap.ui.define([
 		scene.add(floorMesh);
 
 		// Check if the data is loaded from OData Model
-		if (binData === undefined){
+		if (binData === undefined) {
 			sleep(1000); // Yea, this is not nice...
 		}
 		// Create bin visualization from EWM Masterdata
@@ -208,25 +214,40 @@ sap.ui.define([
 
 	//--- Does the animation
 	function render() {
+		// Update resource data (positions) once the promise is complete
+		if (bRequestComplete) {
+			oListBindingResources = oModelResources.bindList("/Resource", undefined, undefined, undefined, {
+				$select: "whseNo"
+			});
+			oPromiseContexts = oListBindingResources.requestContexts(0, Infinity);
+			bRequestComplete = false;
+		}
 
 		renderer.toneMappingExposure = Math.pow(params.exposure, 5.0); // to allow for very bright scenes.
 		renderer.shadowMap.enabled = params.shadows;
 
-		var forklift = threejsScene.getObjectByName("Forklift");
+		var forklift = oThreejsScene.getObjectByName("Forklift");
 		if (forklift !== undefined) {
 			var time = Date.now() * 0.0005;
 			forklift.position.x = Math.cos(time) * 1.5 + 1.25;
 			forklift.rotation.y = Math.PI / 2 * time;
 		}
 
-		var picker = threejsScene.getObjectByName("Picker");
+		var picker = oThreejsScene.getObjectByName("Picker");
 		if (picker !== undefined) {
-			//var time = Date.now() * 0.0005;
-			picker.position.z = Math.cos(time) * 1.5 + 1.25;
+			picker.position.x = oJSONResources.oData[0].x;
+			picker.position.y = oJSONResources.oData[0].y;
+			picker.position.z = oJSONResources.oData[0].z;
 			picker.rotation.y = Math.PI / 2 * time;
 		}
 		renderer.render(scene, camera);
-		viewerReference.getViewport().setShouldRenderFrame(); // Updates the SAP viewport
+		oViewerReference.getViewport().setShouldRenderFrame(); // Updates the SAP viewport
+
+		// This is the list with the resources
+		Promise.all([oPromiseContexts]).then(function (aResourceContexts) {
+			oJSONResources.setData(aResourceContexts[0].map(oContexts => oContexts.getObject()));
+			bRequestComplete = true;
+		});
 	}
 
 	//--- Manages the animation
@@ -264,16 +285,25 @@ sap.ui.define([
 
 			ContentConnector.addContentManagerResolver(threejsContentManagerResolver);
 
+			// Prepare the OData Model for the resources
+			oModelResources = this.getView().getModel("resourceData");
+			oListBindingResources = oModelResources.bindList("/Resource", undefined, undefined, undefined, {
+				$select: "whseNo"
+			});
+			oPromiseContexts = oListBindingResources.requestContexts(0, Infinity);
+			oJSONResources = this.getView().getModel("whseResourcesJSON");
+
 			//Get storage bin data and pass it to the init function
 			var oJSONBins = this.getView().getModel("whseBinsJSON");
 			var oJSONBinTypes = this.getView().getModel("whseBinTypesJSON");
-			viewerReference = this.getView().byId("viewer");
+			oViewerReference = this.getView().byId("viewer");
+
 			// Call the 3D Scene Initialization with the fetched data
 			init(oJSONBins.oData.WhseBins, oJSONBinTypes.oData.WhseBinTypes);
 
-			viewerReference.attachSceneLoadingSucceeded(function (oEvent) {
+			oViewerReference.attachSceneLoadingSucceeded(function (oEvent) {
 				// Contains the reference to the scene
-				threejsScene = oEvent.getParameter("scene").getSceneRef();
+				oThreejsScene = oEvent.getParameter("scene").getSceneRef();
 				animate();
 			});
 
@@ -284,6 +314,12 @@ sap.ui.define([
 					name: "Scene"
 				})
 			);
+
+			// This is the list with the resources
+			Promise.all([oPromiseContexts]).then(function (aResourceContexts) {
+				oJSONResources.setData(aResourceContexts[0].map(oContexts => oContexts.getObject()));
+				bRequestComplete = true;
+			});
 		},
 
 		// Called every time the view is rendered again
