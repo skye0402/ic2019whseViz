@@ -39,52 +39,13 @@ sap.ui.define([
 		}
 	}
 
-	function init(binData, binTypeData) {
+	function initScene(binData, binTypeData) {
 		camera = new THREE.PerspectiveCamera(50, 1.6, 0.1, 100); //----TODO Must adjust the ratio dynamically!
 		camera.position.x = -4;
 		camera.position.z = 4;
 		camera.position.y = 2;
 		scene = new THREE.Scene();
 		scene.name = "Warehouse";
-
-		// Load 3D models asynchronous
-		var gltfLoaderURL = oResourceBundle.getText("gltfLoaderURL").toString().trim();
-		jQuery.ajax({
-			url: gltfLoaderURL,
-			dataType: "script",
-			cache: true
-		}).done(function () {
-			var loader = new THREE.GLTFLoader();
-			loader.load("resources/Forklift.gltf", function (gltf) {
-				gltf.scene.traverse(function (node) {
-					if (node instanceof THREE.Mesh) {
-						node.castShadow = true;
-					}
-				});
-				gltf.scene.name = "Forklift";
-				gltf.scene.position.x = 15;
-				gltf.scene.position.y = 0;
-				gltf.scene.position.z = 24;
-				scene.add(gltf.scene);
-			}, undefined, function (error) {
-				console.error(error);
-			});
-			loader.load("resources/Picker.gltf", function (gltf) {
-				gltf.scene.traverse(function (node) {
-					if (node instanceof THREE.Mesh) {
-						node.castShadow = true;
-					}
-				});
-				gltf.scene.name = "Picker";
-				gltf.scene.position.x = 17;
-				gltf.scene.position.y = 0;
-				gltf.scene.position.z = 20;
-				gltf.scene.castShadow = true;
-				scene.add(gltf.scene);
-			}, undefined, function (error) {
-				console.error(error);
-			});
-		});
 
 		// create ceiling lights
 		for (var i = 1; i < 4; i++) {
@@ -212,15 +173,56 @@ sap.ui.define([
 		renderer.setPixelRatio(window.devicePixelRatio);
 	}
 
+	function initResources(resourceData) {
+		// Load 3D models asynchronous
+		var gltfLoaderURL = oResourceBundle.getText("gltfLoaderURL").toString().trim();
+		jQuery.ajax({
+			url: gltfLoaderURL,
+			dataType: "script",
+			cache: true
+		}).done(function () {
+			var loader = new THREE.GLTFLoader();
+			loader.load("resources/Forklift.gltf", function (gltf) {
+				gltf.scene.traverse(function (node) {
+					if (node instanceof THREE.Mesh) {
+						node.castShadow = true;
+					}
+				});
+				gltf.scene.name = "Forklift";
+				gltf.scene.position.x = 15;
+				gltf.scene.position.y = 0;
+				gltf.scene.position.z = 24;
+				scene.add(gltf.scene);
+			}, undefined, function (error) {
+				console.error(error);
+			});
+			loader.load("resources/Picker.gltf", function (gltf) {
+				gltf.scene.traverse(function (node) {
+					if (node instanceof THREE.Mesh) {
+						node.castShadow = true;
+					}
+				});
+				gltf.scene.name = "Picker";
+				gltf.scene.position.x = 17;
+				gltf.scene.position.y = 0;
+				gltf.scene.position.z = 20;
+				gltf.scene.castShadow = true;
+				scene.add(gltf.scene);
+			}, undefined, function (error) {
+				console.error(error);
+			});
+		});
+	}
+
 	//--- Does the animation
 	function render() {
 		// Update resource data (positions) once the promise is complete
 		if (bRequestComplete) {
+			bRequestComplete = false;
 			oListBindingResources = oModelResources.bindList("/Resource", undefined, undefined, undefined, {
 				$select: "whseNo"
 			});
 			oPromiseContexts = oListBindingResources.requestContexts(0, Infinity);
-			bRequestComplete = false;
 		}
 
 		renderer.toneMappingExposure = Math.pow(params.exposure, 5.0); // to allow for very bright scenes.
@@ -299,7 +301,7 @@ sap.ui.define([
 			oViewerReference = this.getView().byId("viewer");
 
 			// Call the 3D Scene Initialization with the fetched data
-			init(oJSONBins.oData.WhseBins, oJSONBinTypes.oData.WhseBinTypes);
+			initScene(oJSONBins.oData.WhseBins, oJSONBinTypes.oData.WhseBinTypes);
 
 			oViewerReference.attachSceneLoadingSucceeded(function (oEvent) {
 				// Contains the reference to the scene
@@ -318,7 +320,8 @@ sap.ui.define([
 			// This is the list with the resources
 			Promise.all([oPromiseContexts]).then(function (aResourceContexts) {
 				oJSONResources.setData(aResourceContexts[0].map(oContexts => oContexts.getObject()));
-				bRequestComplete = true;
+				// Call the resource loading according to the resources announced by OData-Service
+				initResources(oJSONResources.oData);
 			});
 		},
 
