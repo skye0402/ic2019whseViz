@@ -1,0 +1,54 @@
+<mvc:View controllerName="warehouseViewer.warehouseViewer.controller.Home" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:l="sap.ui.layout">
+	<Page>
+		<customHeader>
+			<Bar>
+				<contentLeft>
+					<Image src="images/CompanyLogo.png" height="100%" press="onPressLogo"/>
+				</contentLeft>
+				<contentMiddle>
+					<Title level="H2" titleStyle="H2" text="{i18n>homePageTitle}"/>
+				</contentMiddle>
+				<contentRight>
+					<Button icon="sap-icon://customer" press="onAvatarPress" tooltip="{i18n>avatarButtonTooltip}"/>
+				</contentRight>
+			</Bar>
+		</customHeader>
+		<l:VerticalLayout class="sapUiResponsiveMargin">
+			<Title titleStyle="H2" text="Menu" class="sapUiTinyMarginBegin"/>
+			<l:HorizontalLayout allowWrapping="true">
+				<GenericTile header="3D Warehouse" subheader="Bins Locaion" id="tile1" class="sapUiTinyMargin" press="PressTile1">
+					<TileContent>
+						<ImageContent src="sap-icon://shelf"/>
+					</TileContent>
+				</GenericTile>
+				<GenericTile header="Master Data" subheader="Bins Workers" id="tile2" class="sapUiTinyMargin" press="PressTile2">
+					<TileContent>
+						<ImageContent src="sap-icon://business-objects-experience"/>
+					</TileContent>
+				</GenericTile>
+			</l:HorizontalLayout>
+			<Title titleStyle="H2" text="Links" class="sapUiTinyMargin"/>
+			<l:HorizontalLayout allowWrapping="true">
+				<GenericTile header="Link1" class="sapUiTinyMargin" press="onTilePressed1">
+					<TileContent>
+						<ImageContent src="sap-icon://internet-browser"/>
+					</TileContent>
+				</GenericTile>
+				<GenericTile header="Link2" class="sapUiTinyMargin" press="onTilePressed2">
+					<TileContent>
+						<ImageContent src="sap-icon://internet-browser"/>
+					</TileContent>
+				</GenericTile>
+			</l:HorizontalLayout>
+		</l:VerticalLayout>
+		<!--<footer>-->
+		<!--	<Toolbar>-->
+		<!--		<content>-->
+		<!--<ToolbarSpacer/>-->
+		<!--<Button text="Grouped View"/>-->
+		<!--<Button text="Classical Table"/>-->
+		<!--		</content>-->
+		<!--	</Toolbar>-->
+		<!--</footer>-->
+	</Page>
+</mvc:View>

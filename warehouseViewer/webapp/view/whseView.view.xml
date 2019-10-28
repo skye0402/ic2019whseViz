@@ -3,7 +3,7 @@
 	<Shell id="shell">
 		<App id="app">
 			<pages>
-				<Page title="{i18n>title}">
+				<Page title="{i18n>title}" showNavButton="true" navButtonPress="onNavBack">
 					<vk:Viewer id="viewer">
 					</vk:Viewer>
 				</Page>
