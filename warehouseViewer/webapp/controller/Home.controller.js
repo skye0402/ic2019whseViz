@@ -12,7 +12,7 @@ sap.ui.define([
 		
 		PressTile2: function () {
 			var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-			oRouter.navTo("analysis");
+			oRouter.navTo("page");
 		},
 
 		onTilePressed1: function () {

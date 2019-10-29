@@ -149,6 +149,10 @@
 				"name": "warehouse",
 				"pattern": "warehouse",
 				"target": ["warehouse"]
+			},{
+				"name": "page",
+				"pattern": "page",
+				"target": ["Page"]
 			}],
 			"targets": {
 				"home": {
@@ -158,6 +162,10 @@
 				"warehouse": {
 					"transition": "slide",
 					"viewName": "whseView"
+				},
+				"page": {
+					"transition": "slide",
+					"viewName": "Page"
 				}
 			}
 		}
