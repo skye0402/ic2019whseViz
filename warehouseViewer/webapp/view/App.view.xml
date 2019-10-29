@@ -1,6 +1,6 @@
 <mvc:View controllerName="warehouseViewer.warehouseViewer.controller.App" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc"
 	displayBlock="true" xmlns="sap.m">
 	<Shell>
-	<App id="app" backgroundImage="images/startpage.jpg" backgroundOpacity="0.2"/>
+	<App id="app" backgroundImage="images/start_2.jpg" backgroundOpacity="0.2"/>
 	</Shell>
 </mvc:View>

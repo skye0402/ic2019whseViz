@@ -21,7 +21,7 @@
 						<ImageContent src="sap-icon://shelf"/>
 					</TileContent>
 				</GenericTile>
-				<GenericTile header="{i18n>masterData}" subheader="{i18n>mResource}" id="tile2" class="sapUiTinyMargin" press="PressTile2">
+				<GenericTile header="{i18n>checkSchedule}" subheader="{i18n>cSchedule}" id="tile2" class="sapUiTinyMargin" press="PressTile2">
 					<TileContent>
 						<ImageContent src="sap-icon://business-objects-experience"/>
 					</TileContent>
