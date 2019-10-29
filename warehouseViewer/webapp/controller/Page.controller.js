@@ -14,9 +14,9 @@ sap.ui.define([
 				oModel.setData({
 					startDate: new Date("2017", "0", "15", "8", "0"),
 					people: [{
-						pic: "test-resources/sap/ui/documentation/sdk/images/John_Miller.png",
-						name: "John Miller",
-						role: "team member",
+						pic: "images/pic_3.jpg",
+						name: "Albrecht, Gunter",
+						role: "Manager",
 						appointments: [
 							{
 								start: new Date("2017", "0", "8", "08", "30"),
@@ -203,7 +203,7 @@ sap.ui.define([
 							{
 								start: new Date("2017", "0", "15", "17", "0"),
 								end: new Date("2017", "0", "15", "19", "0"),
-								title: "Reminder",
+								title: "Resource Plan",
 								type: "Type06"
 							},
 							{
@@ -223,9 +223,9 @@ sap.ui.define([
 						]
 					},
 						{
-							pic: "test-resources/sap/ui/documentation/sdk/images/Donna_Moore.jpg",
-							name: "Donna Moore",
-							role: "team member",
+							pic: "images/pic_2.jpg",
+							name: "Yuta Kanbe",
+							role: "Folklift operator",
 							appointments: [
 								{
 									start: new Date("2017", "0", "10", "18", "00"),
@@ -245,41 +245,43 @@ sap.ui.define([
 								},
 								{
 									start: new Date("2017", "0", "15", "08", "00"),
-									end: new Date("2017", "0", "15", "09", "30"),
-									title: "Discussion of the plan",
-									info: "Online meeting",
+									end: new Date("2017", "0", "15", "09", "00"),
+									title: "Maintenance",
+									info: "Garage D",
 									type: "Type04",
 									tentative: false
 								},
 								{
-									start: new Date("2017", "0", "15", "10", "0"),
-									end: new Date("2017", "0", "15", "12", "0"),
-									title: "Team meeting",
-									info: "room 1",
+									start: new Date("2017", "0", "15", "09", "30"),
+									end: new Date("2017", "0", "15", "12", "30"),
+									title: "Stock-taking",
+									info: "Shelf 1-35",
 									type: "Type01",
 									pic: "sap-icon://sap-ui5",
 									tentative: false
 								},
 								{
-									start: new Date("2017", "0", "15", "18", "00"),
-									end: new Date("2017", "0", "15", "19", "10"),
-									title: "Discussion of the plan",
-									info: "Online meeting",
+									start: new Date("2017", "0", "15", "12", "45"),
+									end: new Date("2017", "0", "15", "14", "00"),
+									title: "Lunch",
+									info: "Cafeteria",
 									type: "Type04",
 									tentative: false
 								},
 								{
-									start: new Date("2017", "0", "16", "10", "0"),
-									end: new Date("2017", "0", "31", "12", "0"),
-									title: "Workshop out of the country",
+									start: new Date("2017", "0", "15", "14", "00"),
+									end: new Date("2017", "0", "15", "17", "30"),
+									title: "Special operation for SAP",
+									info:"Include briefing",
 									type: "Type07",
 									pic: "sap-icon://sap-ui5",
 									tentative: false
 								},
 								{
-									start: new Date("2018", "0", "1", "0", "0"),
-									end: new Date("2018", "2", "31", "23", "59"),
-									title: "New quarter",
+									start: new Date("2017", "0", "15", "17", "30"),
+									end: new Date("2017", "0", "15", "18", "30"),
+									title: "Meeting with Gunter",
+									info:"room A",
 									type: "Type10",
 									tentative: false
 								},
@@ -320,43 +322,62 @@ sap.ui.define([
 								{
 									start: new Date("2017", "0", "15", "9", "0"),
 									end: new Date("2017", "0", "15", "10", "0"),
-									title: "Payment reminder",
-									type: "Type06"
-								},
-								{
-									start: new Date("2017", "0", "15", "16", "30"),
-									end: new Date("2017", "0", "15", "18", "00"),
-									title: "Private appointment",
+									title: "Move",
 									type: "Type06"
 								}
 							]
 						},
 						{
-							pic: "sap-icon://employee",
-							name: "Max Mustermann",
-							role: "team member",
+							pic: "images/pic_4.jpg",
+							name: "Mizutani, Shigefumi",
+							role: "Wharehouse worker",
 							appointments: [
 								{
 									start: new Date("2017", "0", "15", "08", "30"),
 									end: new Date("2017", "0", "15", "09", "30"),
-									title: "Meet John Miller",
+									title: "Work Prep",
 									type: "Type02",
 									tentative: false
 								},
 								{
-									start: new Date("2017", "0", "15", "10", "0"),
-									end: new Date("2017", "0", "15", "12", "0"),
-									title: "Team meeting",
+									start: new Date("2017", "0", "15", "09", "30"),
+									end: new Date("2017", "0", "15", "10", "30"),
+									title: "Team MTG",
 									info: "room 1",
 									type: "Type01",
 									pic: "sap-icon://sap-ui5",
 									tentative: false
 								},
 								{
-									start: new Date("2017", "0", "15", "13", "00"),
+									start: new Date("2017", "0", "15", "10", "30"),
+									end: new Date("2017", "0", "15", "12", "30"),
+									title: "Product Pick-up ",
+									info: "Shelf 1-15",
+									type: "Type02",
+									tentative: false
+								},
+								{
+									start: new Date("2017", "0", "15", "12", "30"),
+									end: new Date("2017", "0", "15", "13", "30"),
+									title: "Lunch",
+									info: "Cafeteria",
+									type: "Type04",
+									tentative: false
+								},
+								{
+									start: new Date("2017", "0", "15", "13", "30"),
 									end: new Date("2017", "0", "15", "16", "00"),
-									title: "Discussion with clients",
-									info: "online",
+									title: "Stock-taking ",
+									info: "Shelf 20-25",
+									type: "Type07",
+									pic: "sap-icon://sap-ui5",
+									tentative: false
+								},
+								{
+									start: new Date("2017", "0", "15", "16", "30"),
+									end: new Date("2017", "0", "15", "18", "30"),
+									title: "Briefing for new picking process",
+									info: "room 3",
 									type: "Type02",
 									tentative: false
 								},
@@ -381,6 +402,123 @@ sap.ui.define([
 									start: new Date("2017", "0", "19", "08", "30"),
 									end: new Date("2017", "0", "19", "18", "30"),
 									title: "Meet John Doe",
+									type: "Type02",
+									tentative: false
+								},
+								{
+									start: new Date("2017", "0", "19", "10", "0"),
+									end: new Date("2017", "0", "19", "16", "0"),
+									title: "Team meeting",
+									info: "room 1",
+									type: "Type01",
+									pic: "sap-icon://sap-ui5",
+									tentative: false
+								},
+								{
+									start: new Date("2017", "0", "19", "07", "00"),
+									end: new Date("2017", "0", "19", "17", "30"),
+									title: "Discussion with clients",
+									type: "Type02",
+									tentative: false
+								},
+								{
+									start: new Date("2017", "0", "20", "0", "0"),
+									end: new Date("2017", "0", "20", "23", "59"),
+									title: "Vacation",
+									info: "out of office",
+									type: "Type04",
+									tentative: false
+								},
+								{
+									start: new Date("2017", "0", "22", "07", "00"),
+									end: new Date("2017", "0", "27", "17", "30"),
+									title: "Discussion with clients",
+									info: "out of office",
+									type: "Type02",
+									tentative: false
+								},
+								{
+									start: new Date("2017", "2", "13", "9", "0"),
+									end: new Date("2017", "2", "17", "10", "0"),
+									title: "Payment week",
+									type: "Type06"
+								},
+								{
+									start: new Date("2017", "03", "10", "0", "0"),
+									end: new Date("2017", "05", "16", "23", "59"),
+									title: "Vacation",
+									info: "out of office",
+									type: "Type04",
+									tentative: false
+								},
+								{
+									start: new Date("2017", "07", "1", "0", "0"),
+									end: new Date("2017", "09", "31", "23", "59"),
+									title: "New quarter",
+									type: "Type10",
+									tentative: false
+								}
+							],
+							headers: [
+								{
+									start: new Date("2017", "0", "16", "0", "0"),
+									end: new Date("2017", "0", "16", "23", "59"),
+									title: "Private",
+									type: "Type05"
+								}
+							]
+						},
+						{
+							pic: "images/pic_5.jpg",
+							name: "Haruyuki Kobayashi",
+							role: "Wharehouse worker",
+							appointments: [
+								{
+									start: new Date("2017", "0", "15", "08", "30"),
+									end: new Date("2017", "0", "15", "09", "30"),
+									title: "Work Prep",
+									type: "Type02",
+									tentative: false
+								},
+								{
+									start: new Date("2017", "0", "15", "09", "30"),
+									end: new Date("2017", "0", "15", "10", "30"),
+									title: "Team MTG",
+									info: "room 1",
+									type: "Type01",
+									pic: "sap-icon://sap-ui5",
+									tentative: false
+								},
+								{
+									start: new Date("2017", "0", "15", "10", "30"),
+									end: new Date("2017", "0", "15", "12", "30"),
+									title: "Product Pick-up ",
+									info: "Shelf 1-15",
+									type: "Type02",
+									tentative: false
+								},
+								{
+									start: new Date("2017", "0", "15", "12", "30"),
+									end: new Date("2017", "0", "15", "13", "30"),
+									title: "Lunch",
+									info: "Cafeteria",
+									type: "Type04",
+									tentative: false
+								},
+								{
+									start: new Date("2017", "0", "15", "13", "30"),
+									end: new Date("2017", "0", "15", "16", "00"),
+									title: "Stock-taking ",
+									info: "Shelf 20-25",
+									type: "Type07",
+									pic: "sap-icon://sap-ui5",
+									tentative: false
+								},
+								{
+									start: new Date("2017", "0", "15", "16", "30"),
+									end: new Date("2017", "0", "15", "18", "30"),
+									title: "Briefing for new picking process",
+									info: "room 3",
 									type: "Type02",
 									tentative: false
 								},

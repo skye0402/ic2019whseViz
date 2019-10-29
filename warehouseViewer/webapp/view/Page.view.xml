@@ -14,7 +14,7 @@
 			showEmptyIntervalHeaders="false"
 			showWeekNumbers="true">
 			<toolbarContent>
-				<Title text="Title" titleStyle="H4"/>
+				<Title text="Schedule Viewer" titleStyle="H2"/>
 			</toolbarContent>
 			<rows>
 				<PlanningCalendarRow
