@@ -16,12 +16,12 @@
 		<l:VerticalLayout class="sapUiResponsiveMargin">
 			<Title titleStyle="H2" text="Menu" class="sapUiTinyMarginBegin"/>
 			<l:HorizontalLayout allowWrapping="true">
-				<GenericTile header="3D Warehouse" subheader="Bins Locaion" id="tile1" class="sapUiTinyMargin" press="PressTile1">
+				<GenericTile header="{i18n>binVizHeader}" subheader="{i18n>binVizDesc}" id="tile1" class="sapUiTinyMargin" press="PressTile1">
 					<TileContent>
 						<ImageContent src="sap-icon://shelf"/>
 					</TileContent>
 				</GenericTile>
-				<GenericTile header="Master Data" subheader="Bins Workers" id="tile2" class="sapUiTinyMargin" press="PressTile2">
+				<GenericTile header="{i18n>masterData}" subheader="{i18n>mResource}" id="tile2" class="sapUiTinyMargin" press="PressTile2">
 					<TileContent>
 						<ImageContent src="sap-icon://business-objects-experience"/>
 					</TileContent>
