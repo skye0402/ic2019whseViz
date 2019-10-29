@@ -7,9 +7,10 @@ sap.ui.define([
 	"sap/ui/vk/ContentConnector",
 	"sap/ui/vk/threejs/thirdparty/three",
 	"sap/ui/model/odata/v4/ODataModel",
-	"ext/GLTFLoader"
-], function (Controller, MessageToast, ContentResource, ContentConnector, threejs, ODataModel,GLTFLoader) {
-	//"use strict";
+	"ext/GLTFLoader",
+	"sap/ui/core/routing/History"
+], function (Controller, MessageToast, ContentResource, ContentConnector, threejs, ODataModel,GLTFLoader, History) {
+	"use strict";
 
 	// ----------- Get i18n model -----------------------------------
 	var oResourceBundle;
@@ -275,21 +276,21 @@ sap.ui.define([
 				}
 			}
 			// Create reference to i18n model
-			oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
+			oResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
 
 			ContentConnector.addContentManagerResolver(threejsContentManagerResolver);
 
 			// Prepare the OData Model for the resources
-			oModelResources = this.getView().getModel("resourceData");
+			oModelResources = this.getOwnerComponent().getModel("resourceData");
 			oListBindingResources = oModelResources.bindList("/Resource", undefined, undefined, undefined, {
 				$select: "whseNo"
 			});
 			oPromiseContexts = oListBindingResources.requestContexts(0, Infinity);
-			oJSONResources = this.getView().getModel("whseResourcesJSON");
+			oJSONResources = this.getOwnerComponent().getModel("whseResourcesJSON");
 
 			//Get storage bin data and pass it to the init function
-			var oJSONBins = this.getView().getModel("whseBinsJSON");
-			var oJSONBinTypes = this.getView().getModel("whseBinTypesJSON");
+			var oJSONBins = this.getOwnerComponent().getModel("whseBinsJSON");
+			var oJSONBinTypes = this.getOwnerComponent().getModel("whseBinTypesJSON");
 			oViewerReference = this.getView().byId("viewer");
 
 			// Call the 3D Scene Initialization with the fetched data
@@ -320,6 +321,18 @@ sap.ui.define([
 		// Called every time the view is rendered again
 		onBeforeRendering: function () {
 			var threejsContent = this.getView().byId("viewer").getContentResources(); //TODO test only
+		},
+
+		onNavBack: function () {
+			var oHistory = History.getInstance();
+			var sPreviousHash = oHistory.getPreviousHash();
+
+			if (sPreviousHash !== undefined) {
+				window.history.go(-1);
+			} else {
+				var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+				oRouter.navTo("home", true);
+			}
 		}
 	});
 });
