@@ -9,7 +9,7 @@ sap.ui.define([
 	"sap/ui/model/odata/v4/ODataModel",
 	"ext/GLTFLoader",
 	"sap/ui/core/routing/History"
-], function (Controller, MessageToast, ContentResource, ContentConnector, threejs, ODataModel,GLTFLoader, History) {
+], function (Controller, MessageToast, ContentResource, ContentConnector, threejs, ODataModel, GLTFLoader, History) {
 	"use strict";
 
 	// ----------- Get i18n model -----------------------------------
@@ -179,32 +179,25 @@ sap.ui.define([
 
 	function initResources(resourceData) {
 		// Load 3D models asynchronous based on the data provided
-/*		var gltfLoaderURL = oResourceBundle.getText("gltfLoaderURL").toString().trim();
-		jQuery.ajax({
-			url: gltfLoaderURL,
-			dataType: "script",
-			cache: true
-		}).done(function () {*/
-			var loader = new THREE.GLTFLoader();
-			// Loop over the resources
-			for (let oResource of resourceData) {
-				let sModelName = "resources/" + oResource.model3D + ".gltf";
-				loader.load(sModelName, function (gltf) {
-					gltf.scene.traverse(function (node) {
-						if (node instanceof THREE.Mesh) {
-							node.castShadow = true;
-						}
-					});
-					gltf.scene.name = oResource.model3D + "-" +oResource.tagID;
-					gltf.scene.position.x = parseFloat(oResource.x);
-					gltf.scene.position.y = parseFloat(oResource.y);
-					gltf.scene.position.z = parseFloat(oResource.z);
-					scene.add(gltf.scene);
-				}, undefined, function (error) {
-					console.error(error);
+		var loader = new THREE.GLTFLoader();
+		// Loop over the resources
+		for (let oResource of resourceData) {
+			let sModelName = "resources/" + oResource.model3D + ".gltf";
+			loader.load(sModelName, function (gltf) {
+				gltf.scene.traverse(function (node) {
+					if (node instanceof THREE.Mesh) {
+						node.castShadow = true;
+					}
 				});
-			};
-/*		});*/
+				gltf.scene.name = oResource.model3D + "-" + oResource.tagID;
+				gltf.scene.position.x = parseFloat(oResource.x);
+				gltf.scene.position.y = parseFloat(oResource.y);
+				gltf.scene.position.z = parseFloat(oResource.z);
+				scene.add(gltf.scene);
+			}, undefined, function (error) {
+				console.error(error);
+			});
+		};
 	}
 
 	//--- Does the animation
@@ -221,20 +214,25 @@ sap.ui.define([
 		renderer.toneMappingExposure = Math.pow(params.exposure, 5.0); // to allow for very bright scenes.
 		renderer.shadowMap.enabled = params.shadows;
 
-		var forklift = oThreejsScene.getObjectByName("Forklift-D328");
-		if (forklift !== undefined) {
-			var time = Date.now() * 0.0005;
-			forklift.position.x = Math.cos(time) * 1.5 + 1.25;
-			forklift.rotation.y = Math.PI / 2 * time;
+		// Loop over resources to update to the latest position
+		for (let i = 0; i<oJSONResources.oData.length; i++) {
+			// Aquire the object from the scene
+			let oResource = oJSONResources.oData[i];
+			let oObject3D = oThreejsScene.getObjectByName(oResource.model3D + "-" + oResource.tagID);
+			if (oObject3D !== undefined) {
+				oObject3D.position.x = oResource.x;
+				oObject3D.position.y = oResource.y;
+				oObject3D.position.z = oResource.z;
+				oObject3D.rotation.y = 1.8;
+			}
 		}
+		/*		var forklift = oThreejsScene.getObjectByName("Forklift-D328");
+				if (forklift !== undefined) {
+					var time = Date.now() * 0.0005;
+					forklift.position.x = Math.cos(time) * 1.5 + 1.25;
+					forklift.rotation.y = Math.PI / 2 * time;
+				}*/
 
-		var picker = oThreejsScene.getObjectByName("Picker-E232");
-		if (picker !== undefined) {
-			picker.position.x = oJSONResources.oData[0].x;
-			picker.position.y = oJSONResources.oData[0].y;
-			picker.position.z = oJSONResources.oData[0].z;
-			picker.rotation.y = Math.PI / 2 * time;
-		}
 		renderer.render(scene, camera);
 		oViewerReference.getViewport().setShouldRenderFrame(); // Updates the SAP viewport
 
