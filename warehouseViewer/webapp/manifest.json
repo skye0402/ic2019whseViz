@@ -59,10 +59,10 @@
 	"sap.ui5": {
 		"flexEnabled": false,
 		"rootView": {
-			"viewName": "warehouseViewer.warehouseViewer.view.whseView",
+			"viewName": "warehouseViewer.warehouseViewer.view.App",
 			"type": "XML",
 			"async": true,
-			"id": "whseView"
+			"id": "App"
 		},
 		"dependencies": {
 			"minUI5Version": "1.65.6",
@@ -142,16 +142,21 @@
 				"clearControlAggregation": false
 			},
 			"routes": [{
-				"name": "RoutewhseView",
-				"pattern": "RoutewhseView",
-				"target": ["TargetwhseView"]
+				"name": "home",
+				"pattern": "",
+				"target": ["home"]
+			}, {
+				"name": "warehouse",
+				"pattern": "warehouse",
+				"target": ["warehouse"]
 			}],
 			"targets": {
-				"TargetwhseView": {
-					"viewType": "XML",
+				"home": {
 					"transition": "slide",
-					"clearControlAggregation": false,
-					"viewId": "whseView",
+					"viewName": "Home"
+				},
+				"warehouse": {
+					"transition": "slide",
 					"viewName": "whseView"
 				}
 			}
