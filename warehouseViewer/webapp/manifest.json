@@ -153,6 +153,10 @@
 				"name": "page",
 				"pattern": "page",
 				"target": ["page"]
+			},{
+				"name": "grid",
+				"pattern": "grid",
+				"target": ["grid"]
 			}],
 			"targets": {
 				"home": {
@@ -166,6 +170,10 @@
 				"page": {
 					"transition": "slide",
 					"viewName": "Page"
+				},
+				"grid": {
+					"transition": "slide",
+					"viewName": "Grid"
 				}
 			}
 		}

@@ -27,11 +27,11 @@
 					</TileContent>
 				</GenericTile>
 			</l:HorizontalLayout>
-			<Title titleStyle="H2" text="Links" class="sapUiTinyMargin"/>
+			<Title titleStyle="H2" text="For Manager" class="sapUiTinyMargin"/>
 			<l:HorizontalLayout allowWrapping="true">
-				<GenericTile header="Link1" class="sapUiTinyMargin" press="onTilePressed1">
+				<GenericTile header="Task Status" subheader="{i18n>tStatus}" id="tile3" class="sapUiTinyMargin" press="PressTile3">
 					<TileContent>
-						<ImageContent src="sap-icon://internet-browser"/>
+						<ImageContent src="sap-icon://business-objects-experience"/>
 					</TileContent>
 				</GenericTile>
 				<GenericTile header="Link2" class="sapUiTinyMargin" press="onTilePressed2">

@@ -15,8 +15,9 @@ sap.ui.define([
 			oRouter.navTo("page");
 		},
 
-		onTilePressed1: function () {
-			sap.m.URLHelper.redirect("http://www.trusco.co.jp", true);
+		PressTile3: function () {
+			var oRouter =  sap.ui.core.UIComponent.getRouterFor(this);
+			oRouter.navTo("grid");
 		},
 
 		onTilePressed2: function () {
