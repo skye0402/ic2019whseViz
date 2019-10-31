@@ -3,7 +3,7 @@
 		<customHeader>
 			<Bar>
 				<contentLeft>
-					<Image src="images/CompanyLogo.png" height="100%" press="onPressLogo"/>
+					<Image src="images/SAP_logo.png" height="80%" press="onPressLogo" class="sapUiTinyMarginBottom"/>
 				</contentLeft>
 				<contentMiddle>
 					<Title level="H2" titleStyle="H2" text="{i18n>homePageTitle}"/>
