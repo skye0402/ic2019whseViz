@@ -34,7 +34,7 @@
 						<ImageContent src="sap-icon://business-objects-experience"/>
 					</TileContent>
 				</GenericTile>
-				<GenericTile header="Link2" class="sapUiTinyMargin" press="onTilePressed2">
+				<GenericTile header="EWM Help" subheader="Need any help?" class="sapUiTinyMargin" press="onTilePressed2">
 					<TileContent>
 						<ImageContent src="sap-icon://internet-browser"/>
 					</TileContent>

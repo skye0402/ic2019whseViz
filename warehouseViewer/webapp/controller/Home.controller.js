@@ -21,7 +21,7 @@ sap.ui.define([
 		},
 
 		onTilePressed2: function () {
-			sap.m.URLHelper.redirect("https://www.orange-book.com", true);
+			sap.m.URLHelper.redirect("https://help.sap.com/viewer/product/SAP_EXTENDED_WAREHOUSE_MANAGEMENT/9.5.0.2/en-US", true);
 		}
 
 	});
