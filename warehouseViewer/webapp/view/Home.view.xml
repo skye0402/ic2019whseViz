@@ -1,5 +1,5 @@
 <mvc:View controllerName="warehouseViewer.warehouseViewer.controller.Home" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:l="sap.ui.layout">
-	<Page>
+	<Page backgroundDesign="Transparent">
 		<customHeader>
 			<Bar>
 				<contentLeft>

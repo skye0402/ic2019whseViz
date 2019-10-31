@@ -1,6 +1,6 @@
 <mvc:View controllerName="warehouseViewer.warehouseViewer.controller.Grid"
 		  xmlns="sap.suite.ui.microchart" xmlns:mvc="sap.ui.core.mvc" xmlns:m="sap.m" xmlns:table="sap.ui.table">
-	<m:Page title="{i18n>title}" showNavButton="true" navButtonPress="onNavBack">
+	<m:Page title="{i18n>title}" showNavButton="true" navButtonPress="onNavBack" backgroundDesign="Transparent">
 	<table:Table selectionMode="None" rows="{/Rows}">
 		<table:columns>
 			<table:Column>
