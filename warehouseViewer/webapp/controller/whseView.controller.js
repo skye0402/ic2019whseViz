@@ -22,8 +22,8 @@ sap.ui.define([
 	var bRequestComplete = true;
 
 	// ----------- Threejs functions and variables ------------------
-	var camera, scene, renderer, hemiLight;
-	var bulbMat, ballMat, cubeMat, floorMat, oTextMat;
+	var oCamera, oScene, oRenderer, oHemiLight;
+	// var oBulbMat, oCubeMat, oFloorMat, oTextMat;
 
 	var params = {
 		shadows: true,
@@ -46,7 +46,7 @@ sap.ui.define([
 	//--- Load fonts, create TextGeometry and hand it back to callin function
 	function create3DText(sFontName, sFontWeight, sText, sSize, sHeight, sCurveSegments, sBevelThickness, sBevelSize, sBevelEnabled) {
 		var oLoader = new THREE.FontLoader();
-		//		let o3DText;
+
 		return new Promise(resolve => {
 			oLoader.load("resources/fonts/" + sFontName + '_' + sFontWeight + ".typeface.json",
 				// onLoad callback (called when load has been completed)
@@ -67,34 +67,34 @@ sap.ui.define([
 		});
 	}
 
-	function initScene(binData, binTypeData) {
-		camera = new THREE.PerspectiveCamera(50, 1.6, 0.1, 100); //----TODO Must adjust the ratio dynamically!
-		camera.position.x = -4;
-		camera.position.z = 4;
-		camera.position.y = 2;
-		scene = new THREE.Scene();
-		scene.name = "Warehouse";
+	async function initScene(binData, binTypeData) {
+		oCamera = new THREE.PerspectiveCamera(50, 1.6, 0.1, 100);
+		oCamera.position.x = -4;
+		oCamera.position.z = 4;
+		oCamera.position.y = 2;
+		oScene = new THREE.Scene();
+		oScene.name = "Warehouse";
 
 		// create ceiling lights
 		for (var i = 1; i < 4; i++) {
-			var bulbGeometry = new THREE.SphereBufferGeometry(0.02, 16, 8);
-			var bulbLight = new THREE.PointLight(0xffee88, 1, 100, 2);
-			bulbLight.name = "Warehouse Light ".concat(i.toString());
-			bulbMat = new THREE.MeshStandardMaterial({
+			var oBulbGeometry = new THREE.SphereBufferGeometry(0.02, 16, 8);
+			var oBulbLight = new THREE.PointLight(0xffee88, 1, 100, 2);
+			oBulbLight.name = "Warehouse Light ".concat(i.toString());
+			var oBulbMat = new THREE.MeshStandardMaterial({
 				emissive: 0xffffee,
 				emissiveIntensity: 1,
 				color: 0x000000
 			});
-			bulbLight.add(new THREE.Mesh(bulbGeometry, bulbMat));
-			bulbLight.position.set(10, 3, i * 10);
-			bulbLight.castShadow = true;
-			scene.add(bulbLight);
+			oBulbLight.add(new THREE.Mesh(oBulbGeometry, oBulbMat));
+			oBulbLight.position.set(10, 3, i * 10);
+			oBulbLight.castShadow = true;
+			oScene.add(oBulbLight);
 		}
 
-		hemiLight = new THREE.HemisphereLight(0xddeeff, 0x0f0e0d, 0.02);
-		hemiLight.name = "Surrounding light";
-		scene.add(hemiLight);
-		floorMat =
+		var oHemiLight = new THREE.HemisphereLight(0xddeeff, 0x0f0e0d, 0.02);
+		oHemiLight.name = "Surrounding light";
+		oScene.add(oHemiLight);
+		var oFloorMat =
 			new THREE.MeshStandardMaterial({
 				roughness: 0.8,
 				color: 0xffffff,
@@ -102,59 +102,64 @@ sap.ui.define([
 				bumpScale: 0.0005
 			});
 		var textureLoader = new THREE.TextureLoader();
-		textureLoader.load("textures/hardwood2_diffuse.jpg", function (map) {
+		textureLoader.load("resources/textures/hardwood2_diffuse.jpg", function (map) {
 			map.wrapS = THREE.RepeatWrapping;
 			map.wrapT = THREE.RepeatWrapping;
 			map.anisotropy = 4;
 			map.repeat.set(10, 24);
-			floorMat.map = map;
-			floorMat.needsUpdate = true;
+			oFloorMat.map = map;
+			oFloorMat.needsUpdate = true;
 		});
-		textureLoader.load("textures/hardwood2_bump.jpg", function (map) {
+		textureLoader.load("resources/textures/hardwood2_bump.jpg", function (map) {
 			map.wrapS = THREE.RepeatWrapping;
 			map.wrapT = THREE.RepeatWrapping;
 			map.anisotropy = 4;
 			map.repeat.set(10, 24);
-			floorMat.bumpMap = map;
-			floorMat.needsUpdate = true;
+			oFloorMat.bumpMap = map;
+			oFloorMat.needsUpdate = true;
 		});
-		textureLoader.load("textures/hardwood2_roughness.jpg", function (map) {
+		textureLoader.load("resources/textures/hardwood2_roughness.jpg", function (map) {
 			map.wrapS = THREE.RepeatWrapping;
 			map.wrapT = THREE.RepeatWrapping;
 			map.anisotropy = 4;
 			map.repeat.set(10, 24);
-			floorMat.roughnessMap = map;
-			floorMat.needsUpdate = true;
+			oFloorMat.roughnessMap = map;
+			oFloorMat.needsUpdate = true;
 		});
-		cubeMat = new THREE.MeshStandardMaterial({
+		var oBinBlockMat = new THREE.MeshStandardMaterial({
 			roughness: 0.7,
-			color: 0xffffff,
+			color: 0xff0000,
 			bumpScale: 0.002,
 			metalness: 0.2
 		});
-		oTextMat = new THREE.MeshStandardMaterial({
-			roughness: 0.2,
-			color: 0xAAFFAA,
-			bumpScale: 0.01,
-			metalness: 0.8
+		var oBinFullMat = new THREE.MeshStandardMaterial({
+			roughness: 0.7,
+			color: 0xff7777,
+			bumpScale: 0.002,
+			metalness: 0.2
 		});
-		//changed the texture of bins
-		textureLoader.load("textures/white_plastic_fence_boards_texture.jpg", function (map) {
-			map.wrapS = THREE.RepeatWrapping;
-			map.wrapT = THREE.RepeatWrapping;
-			map.anisotropy = 4;
-			map.repeat.set(1, 1);
-			cubeMat.map = map;
-			cubeMat.needsUpdate = true;
+		var oBinEmptyMat = new THREE.MeshStandardMaterial({
+			roughness: 0.7,
+			color: 0xffffff,
+			bumpScale: 0.002,
+			metalness: 0.2,
+			transparent: true,
+			opacity: 0.4
+		});
+		var oBinFillMat = new THREE.MeshStandardMaterial({
+			roughness: 0.7,
+			color: 0x88ff88,
+			bumpScale: 0.002,
+			metalness: 0.5
 		});
 
-		var floorGeometry = new THREE.PlaneBufferGeometry(100, 80);
-		var floorMesh = new THREE.Mesh(floorGeometry, floorMat);
-		floorMesh.name = "Floor mesh";
-		floorMesh.receiveShadow = true;
-		floorMesh.rotation
+		var oFloorGeometry = new THREE.PlaneBufferGeometry(100, 80);
+		var oFloorMesh = new THREE.Mesh(oFloorGeometry, oFloorMat);
+		oFloorMesh.name = "Warehouse floor";
+		oFloorMesh.receiveShadow = true;
+		oFloorMesh.rotation
 			.x = -Math.PI / 2.0;
-		scene.add(floorMesh);
+		oScene.add(oFloorMesh);
 
 		// Check if the data is loaded from OData Model
 		if (binData === undefined) {
@@ -162,7 +167,7 @@ sap.ui.define([
 		}
 		// Create bin visualization from EWM Masterdata
 		for (i = 0; i < binData.length; i++) {
-			var obj = binData[i];
+			var oStorageBin = binData[i];
 			// Now search the bin type data
 			/*			binTypeData = [{
 							"whseNo": "SG01",
@@ -175,32 +180,92 @@ sap.ui.define([
 						}];*/
 			var binType;
 			$.each(binTypeData, function (i, v) {
-				if (v.whseNo == obj.whseNo && v.binType == obj.binType) {
+				if (v.whseNo == oStorageBin.whseNo && v.binType == oStorageBin.binType) {
 					binType = v; // Found the storage bin type
 					return;
 				}
 			});
-			//To change the vizualization of bins
+
+			//changed the texture of bins
+			let oBinMap = undefined;
+
+			function loadBinTexture(binType) {
+				return new Promise(resolve => {
+					var oMap = undefined;
+					textureLoader.load("resources/textures/" + binType.texture, function (map) {
+						map.wrapS = THREE.RepeatWrapping;
+						map.wrapT = THREE.RepeatWrapping;
+						map.anisotropy = 4;
+						map.repeat.set(1, 1);
+						oMap = map;
+						resolve(oMap);
+					});
+				});
+			}
+			oBinMap = await loadBinTexture(binType);
+
+			// To change the vizualization of bins
 			var boxGeometry = new THREE.BoxBufferGeometry(binType.maxLength, binType.maxHeight, binType.maxWidth);
-			var boxMesh = new THREE.Mesh(boxGeometry, cubeMat);
-			boxMesh.position.set(parseFloat(obj.xC), parseFloat(obj.zC) + 0.25, parseFloat(obj.yC));
-			boxMesh.castShadow = true;
-			boxMesh.name = obj.binNo;
-			scene.add(boxMesh);
+			let oBinMesh = undefined;
+			var bNormal = false;
+			if (oStorageBin.indFull == "X") {
+				oBinFullMat.map = oBinMap;
+				oBinFullMat.needsUpdate = true;
+				oBinMesh = new THREE.Mesh(boxGeometry, oBinFullMat);
+			} else if (oStorageBin.remBlk == "X" || oStorageBin.putBlk == "X" || oStorageBin.invBlk == "X") {
+				oBinBlockMat.map = oBinMap;
+				oBinBlockMat.needsUpdate = true;
+				oBinMesh = new THREE.Mesh(boxGeometry, oBinBlockMat);
+			} else if (oStorageBin.indEmpty == "X") {
+				oBinMesh = new THREE.Mesh(boxGeometry, oBinEmptyMat);
+			} else { // in between full and empty
+				var oBinGroup = new THREE.Group;
+				var fillHeight = binType.maxHeight * (oStorageBin.freeCap / oStorageBin.maxCap);
+				boxGeometry = new THREE.BoxBufferGeometry(binType.maxLength, fillHeight, binType.maxWidth);
+				oBinFillMat.map = oBinMap;
+				oBinFillMat.needsUpdate = true;
+				let oBinMesh1 = new THREE.Mesh(boxGeometry, oBinFillMat);
+				oBinMesh1.position.set(0, 0 - binType.maxHeight / 2 + fillHeight / 2, 0);
+				oBinMesh1.castShadow = true;
+				oBinGroup.add(oBinMesh1);
+				boxGeometry = new THREE.BoxBufferGeometry(binType.maxLength, binType.maxHeight - fillHeight, binType.maxWidth);
+				let oBinMesh2 = new THREE.Mesh(boxGeometry, oBinEmptyMat);
+				oBinMesh2.position.set(0, 0 - binType.maxHeight / 2 + fillHeight + (binType.maxHeight - fillHeight) / 2, 0);
+				oBinMesh2.castShadow = true;
+				oBinGroup.add(oBinMesh2);
+				oBinGroup.name = oStorageBin.binNo;
+				oBinGroup.position.set(parseFloat(oStorageBin.xC), parseFloat(oStorageBin.zC) + 0.25, parseFloat(oStorageBin.yC));
+				oScene.add(oBinGroup);
+				bNormal = true; // Bin is filled to some extent
+			};
+			if (bNormal == false) {
+				oBinMesh.position.set(parseFloat(oStorageBin.xC), parseFloat(oStorageBin.zC) + 0.25, parseFloat(oStorageBin.yC));
+				oBinMesh.castShadow = true;
+				oBinMesh.name = oStorageBin.binNo;
+				oScene.add(oBinMesh);
+			}
+			bNormal = false;
 		}
 
-		renderer = new THREE.WebGLRenderer();
-		renderer.physicallyCorrectLights = true;
-		renderer.gammaInput = true;
-		renderer.gammaOutput = true;
-		renderer.shadowMap.enabled = true;
-		renderer.toneMapping = THREE.ReinhardToneMapping;
-		renderer.setPixelRatio(window.devicePixelRatio);
+		oRenderer = new THREE.WebGLRenderer();
+		oRenderer.physicallyCorrectLights = true;
+		oRenderer.gammaInput = true;
+		oRenderer.gammaOutput = true;
+		oRenderer.shadowMap.enabled = true;
+		oRenderer.toneMapping = THREE.ReinhardToneMapping;
+		oRenderer.setPixelRatio(window.devicePixelRatio);
 	}
 
 	async function initResources(resourceData) {
 		// Load 3D models asynchronous based on the data provided
 		var oLoader = new THREE.GLTFLoader();
+
+		var oTextMat = new THREE.MeshStandardMaterial({
+			roughness: 0.2,
+			color: 0xAAFFAA,
+			bumpScale: 0.01,
+			metalness: 0.8
+		});
 
 		// Loop over the resources
 		for (let oResource of resourceData) {
@@ -228,7 +293,8 @@ sap.ui.define([
 				oResGroup.add(gltf.scene);
 				oResGroup.add(o3DText);
 				oResGroup.name = gltf.scene.name
-				scene.add(oResGroup);
+				new THREE.Box3().setFromObject(oResGroup).getCenter(oResGroup.position).multiplyScalar(-1);
+				oScene.add(oResGroup);
 			}, undefined, function (error) {
 				console.error(error);
 			});
@@ -245,8 +311,8 @@ sap.ui.define([
 			oPromiseContexts = oListBindingResources.requestContexts(0, Infinity);
 		}
 
-		renderer.toneMappingExposure = Math.pow(params.exposure, 5.0); // to allow for very bright scenes.
-		renderer.shadowMap.enabled = params.shadows;
+		oRenderer.toneMappingExposure = Math.pow(params.exposure, 5.0); // to allow for very bright scenes.
+		oRenderer.shadowMap.enabled = params.shadows;
 
 		// Loop over resources to update to the latest position
 		for (let i = 0; i < oJSONResources.oData.length; i++) {
@@ -263,7 +329,7 @@ sap.ui.define([
 			}
 		}
 
-		renderer.render(scene, camera);
+		oRenderer.render(oScene, oCamera);
 		oViewerReference.getViewport().setShouldRenderFrame(); // Updates the SAP viewport
 
 		// This is the list with the resources
@@ -332,7 +398,7 @@ sap.ui.define([
 
 			this.getView().byId("viewer").addContentResource(
 				new ContentResource({
-					source: scene,
+					source: oScene,
 					sourceType: "THREE.Scene",
 					name: "Scene"
 				})
