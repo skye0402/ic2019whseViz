@@ -23,7 +23,7 @@ sap.ui.define([
 
 	// ----------- Threejs functions and variables ------------------
 	var camera, scene, renderer, hemiLight;
-	var bulbMat, ballMat, cubeMat, floorMat;
+	var bulbMat, ballMat, cubeMat, floorMat, oTextMat;
 
 	var params = {
 		shadows: true,
@@ -41,6 +41,30 @@ sap.ui.define([
 				break;
 			}
 		}
+	}
+
+	//--- Load fonts, create TextGeometry and hand it back to callin function
+	function create3DText(sFontName, sFontWeight, sText, sSize, sHeight, sCurveSegments, sBevelThickness, sBevelSize, sBevelEnabled) {
+		var oLoader = new THREE.FontLoader();
+		//		let o3DText;
+		return new Promise(resolve => {
+			oLoader.load("resources/fonts/" + sFontName + '_' + sFontWeight + ".typeface.json",
+				// onLoad callback (called when load has been completed)
+				function (oFont) {
+					let o3DText = new THREE.TextGeometry(sText, {
+						font: oFont,
+						size: sSize,
+						height: sHeight,
+						curveSegments: sCurveSegments,
+						bevelThickness: sBevelThickness,
+						bevelSize: sBevelSize,
+						bevelEnabled: sBevelEnabled,
+						material: 0,
+						extrudeMaterial: 1
+					});
+					resolve(o3DText);
+				});
+		});
 	}
 
 	function initScene(binData, binTypeData) {
@@ -108,6 +132,12 @@ sap.ui.define([
 			bumpScale: 0.002,
 			metalness: 0.2
 		});
+		oTextMat = new THREE.MeshStandardMaterial({
+			roughness: 0.2,
+			color: 0xAAFFAA,
+			bumpScale: 0.01,
+			metalness: 0.8
+		});
 		//changed the texture of bins
 		textureLoader.load("textures/white_plastic_fence_boards_texture.jpg", function (map) {
 			map.wrapS = THREE.RepeatWrapping;
@@ -117,14 +147,6 @@ sap.ui.define([
 			cubeMat.map = map;
 			cubeMat.needsUpdate = true;
 		});
-		// textureLoader.load("textures/brick_bump.jpg", function (map) {
-		// 	map.wrapS = THREE.RepeatWrapping;
-		// 	map.wrapT = THREE.RepeatWrapping;
-		// 	map.anisotropy = 4;
-		// 	map.repeat.set(1, 1);
-		// 	cubeMat.bumpMap = map;
-		// 	cubeMat.needsUpdate = true;
-		// });
 
 		var floorGeometry = new THREE.PlaneBufferGeometry(100, 80);
 		var floorMesh = new THREE.Mesh(floorGeometry, floorMat);
@@ -158,8 +180,7 @@ sap.ui.define([
 					return;
 				}
 			});
-			//To change the vizualization of bins, 
-			//just replaced the content of "WHSEVIZ_WAREHOUSEBINS_BINTABLE" with the testdata "WHSEVIZ_WAREHOUSEBINS_BINTABLE.hdbdata"
+			//To change the vizualization of bins
 			var boxGeometry = new THREE.BoxBufferGeometry(binType.maxLength, binType.maxHeight, binType.maxWidth);
 			var boxMesh = new THREE.Mesh(boxGeometry, cubeMat);
 			boxMesh.position.set(parseFloat(obj.xC), parseFloat(obj.zC) + 0.25, parseFloat(obj.yC));
@@ -177,13 +198,23 @@ sap.ui.define([
 		renderer.setPixelRatio(window.devicePixelRatio);
 	}
 
-	function initResources(resourceData) {
+	async function initResources(resourceData) {
 		// Load 3D models asynchronous based on the data provided
-		var loader = new THREE.GLTFLoader();
+		var oLoader = new THREE.GLTFLoader();
+
 		// Loop over the resources
 		for (let oResource of resourceData) {
+			let o3DTextGeo = await create3DText("helvetiker", "regular", oResource.rsrc, 10, 2, 8, 2, 0.3, true); // The 3D Name of our resource
+
+			let o3DText = new THREE.Mesh(o3DTextGeo, oTextMat);
+			o3DText.scale.set(0.05, 0.05, 0.05);
+			o3DText.geometry.center();
+			o3DText.position.x = parseFloat(oResource.x);
+			o3DText.position.y = parseFloat(oResource.y) + 3;
+			o3DText.position.z = parseFloat(oResource.z);
+
 			let sModelName = "resources/" + oResource.model3D + ".gltf";
-			loader.load(sModelName, function (gltf) {
+			oLoader.load(sModelName, function (gltf) {
 				gltf.scene.traverse(function (node) {
 					if (node instanceof THREE.Mesh) {
 						node.castShadow = true;
@@ -193,13 +224,16 @@ sap.ui.define([
 				gltf.scene.position.x = parseFloat(oResource.x);
 				gltf.scene.position.y = parseFloat(oResource.y);
 				gltf.scene.position.z = parseFloat(oResource.z);
-				scene.add(gltf.scene);
+				var oResGroup = new THREE.Group();
+				oResGroup.add(gltf.scene);
+				oResGroup.add(o3DText);
+				oResGroup.name = gltf.scene.name
+				scene.add(oResGroup);
 			}, undefined, function (error) {
 				console.error(error);
 			});
-		};
-	}
-
+		}
+	};
 	//--- Does the animation
 	function render() {
 		// Update resource data (positions) once the promise is complete
@@ -215,7 +249,7 @@ sap.ui.define([
 		renderer.shadowMap.enabled = params.shadows;
 
 		// Loop over resources to update to the latest position
-		for (let i = 0; i<oJSONResources.oData.length; i++) {
+		for (let i = 0; i < oJSONResources.oData.length; i++) {
 			// Aquire the object from the scene
 			let oResource = oJSONResources.oData[i];
 			let oObject3D = oThreejsScene.getObjectByName(oResource.model3D + "-" + oResource.tagID);
@@ -223,15 +257,11 @@ sap.ui.define([
 				oObject3D.position.x = oResource.x;
 				oObject3D.position.y = oResource.y;
 				oObject3D.position.z = oResource.z;
-				oObject3D.rotation.y = 1.8;
+				oObject3D.rotation.x = oResource.angleX;
+				oObject3D.rotation.y = oResource.angleY;
+				oObject3D.rotation.z = oResource.angleZ;
 			}
 		}
-		/*		var forklift = oThreejsScene.getObjectByName("Forklift-D328");
-				if (forklift !== undefined) {
-					var time = Date.now() * 0.0005;
-					forklift.position.x = Math.cos(time) * 1.5 + 1.25;
-					forklift.rotation.y = Math.PI / 2 * time;
-				}*/
 
 		renderer.render(scene, camera);
 		oViewerReference.getViewport().setShouldRenderFrame(); // Updates the SAP viewport

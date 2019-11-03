@@ -287,7 +287,7 @@ sap.ui.define([
 					}, {
 						pic: "images/pic_4.jpg",
 						name: "Mizutani, Shigefumi",
-						role: "Wharehouse worker",
+						role: "Warehouse worker",
 						appointments: [{
 							start: new Date("2017", "0", "15", "08", "30"),
 							end: new Date("2017", "0", "15", "09", "30"),
@@ -408,7 +408,7 @@ sap.ui.define([
 					}, {
 						pic: "images/pic_5.jpg",
 						name: "Haruyuki Kobayashi",
-						role: "Wharehouse worker",
+						role: "Warehouse worker",
 						appointments: [{
 							start: new Date("2017", "0", "15", "08", "30"),
 							end: new Date("2017", "0", "15", "09", "30"),

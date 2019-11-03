@@ -28,6 +28,7 @@ type MAX_HEIGHT : Decimal(15, 2); // Height
 //--- Resource related data types
 type TAGIDENTIFIER : String(4); // Technical tag ID from RTLS
 type METRICCOORDINATE : Integer; // Coordidates from RTLS in meters
+type ROTATIONANGLE : Integer; // Rotation angle calculated
 type QUALITYOFLOCATION : Integer; // Quality indicator of location from 0..100
 type RSRC      : String(18); // Resource name from EWM
 type RSRC_TYPE : String(4); // Resource type from EWM
@@ -78,6 +79,9 @@ context whseResources {
                 x       : METRICCOORDINATE;
                 y       : METRICCOORDINATE;
                 z       : METRICCOORDINATE;
+                angleX  : ROTATIONANGLE;
+                angleY  : ROTATIONANGLE;
+                angleZ  : ROTATIONANGLE;
                 quality : QUALITYOFLOCATION;
         };
         
@@ -121,9 +125,12 @@ context whseResources {
 	        	rT.model3D, 
 	        	rD.x / 1000 as x : Decimal(15,2), 
 	        	rD.y / 1000 as y : Decimal(15,2), 
-	        	rD.z / 1000 as z : Decimal(15,2)
+	        	rD.z / 1000 as z : Decimal(15,2),
+	        	rD.angleX,
+	        	rD.angleY,
+	        	rD.angleZ,
         	};
         // Combined view on resource data stream
-
+		// TODO:
         	
 };
