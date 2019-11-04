@@ -76,17 +76,17 @@ sap.ui.define([
 		oScene.name = "Warehouse";
 
 		// create ceiling lights
-		for (var i = 1; i < 4; i++) {
+		for (var i = 1; i < 5; i++) {
 			var oBulbGeometry = new THREE.SphereBufferGeometry(0.02, 16, 8);
-			var oBulbLight = new THREE.PointLight(0xffee88, 1, 100, 2);
+			var oBulbLight = new THREE.PointLight(0xffeeaa, 1, 100, 2);
 			oBulbLight.name = "Warehouse Light ".concat(i.toString());
 			var oBulbMat = new THREE.MeshStandardMaterial({
 				emissive: 0xffffee,
-				emissiveIntensity: 1,
+				emissiveIntensity: 0.8,
 				color: 0x000000
 			});
 			oBulbLight.add(new THREE.Mesh(oBulbGeometry, oBulbMat));
-			oBulbLight.position.set(10, 3, i * 10);
+			oBulbLight.position.set(10, 4, i * 10);
 			oBulbLight.castShadow = true;
 			oScene.add(oBulbLight);
 		}
@@ -128,7 +128,7 @@ sap.ui.define([
 		});
 		var oBinBlockMat = new THREE.MeshStandardMaterial({
 			roughness: 0.7,
-			color: 0xff0000,
+			color: 0xAAAAAA,
 			bumpScale: 0.002,
 			metalness: 0.2
 		});
@@ -153,7 +153,7 @@ sap.ui.define([
 			metalness: 0.5
 		});
 
-		var oFloorGeometry = new THREE.PlaneBufferGeometry(100, 80);
+		var oFloorGeometry = new THREE.PlaneBufferGeometry(50, 90);
 		var oFloorMesh = new THREE.Mesh(oFloorGeometry, oFloorMat);
 		oFloorMesh.name = "Warehouse floor";
 		oFloorMesh.receiveShadow = true;
@@ -275,8 +275,8 @@ sap.ui.define([
 			o3DText.scale.set(0.05, 0.05, 0.05);
 			o3DText.geometry.center();
 			o3DText.position.x = parseFloat(oResource.x);
-			o3DText.position.y = parseFloat(oResource.y) + 3;
-			o3DText.position.z = parseFloat(oResource.z);
+			o3DText.position.y = parseFloat(oResource.z) + 3;
+			o3DText.position.z = parseFloat(oResource.y);
 
 			let sModelName = "resources/" + oResource.model3D + ".gltf";
 			oLoader.load(sModelName, function (gltf) {
@@ -287,8 +287,9 @@ sap.ui.define([
 				});
 				gltf.scene.name = oResource.model3D + "-" + oResource.tagID;
 				gltf.scene.position.x = parseFloat(oResource.x);
-				gltf.scene.position.y = parseFloat(oResource.y);
-				gltf.scene.position.z = parseFloat(oResource.z);
+				gltf.scene.position.y = parseFloat(oResource.z);
+				gltf.scene.position.z = parseFloat(oResource.y);
+				if (oResource.model3D == "Forklift") gltf.scene.rotation.y = Math.PI / 2; // Tweaking the model
 				var oResGroup = new THREE.Group();
 				oResGroup.add(gltf.scene);
 				oResGroup.add(o3DText);
@@ -310,7 +311,7 @@ sap.ui.define([
 			});
 			oPromiseContexts = oListBindingResources.requestContexts(0, Infinity);
 		}
-
+		if (oRenderer == undefined) return;
 		oRenderer.toneMappingExposure = Math.pow(params.exposure, 5.0); // to allow for very bright scenes.
 		oRenderer.shadowMap.enabled = params.shadows;
 
@@ -321,11 +322,11 @@ sap.ui.define([
 			let oObject3D = oThreejsScene.getObjectByName(oResource.model3D + "-" + oResource.tagID);
 			if (oObject3D !== undefined) {
 				oObject3D.position.x = oResource.x;
-				oObject3D.position.y = oResource.y;
-				oObject3D.position.z = oResource.z;
+				oObject3D.position.y = oResource.z;
+				oObject3D.position.z = oResource.y;
 				oObject3D.rotation.x = oResource.angleX;
-				oObject3D.rotation.y = oResource.angleY;
-				oObject3D.rotation.z = oResource.angleZ;
+				oObject3D.rotation.y = oResource.angleZ;
+				oObject3D.rotation.z = oResource.angleY;
 			}
 		}
 

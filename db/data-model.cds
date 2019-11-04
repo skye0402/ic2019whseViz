@@ -126,10 +126,10 @@ context whseResources {
 	        	rD.x / 1000 as x : Decimal(15,2), 
 	        	rD.y / 1000 as y : Decimal(15,2), 
 	        	rD.z / 1000 as z : Decimal(15,2),
-	        	rD.angleX,
-	        	rD.angleY,
-	        	rD.angleZ,
-        	};
+	        	rD.angleX / 1000 as angleX : Decimal(15,2),
+	        	rD.angleY / 1000 as angleY : Decimal(15,2),
+	        	rD.angleZ / 1000 as angleZ : Decimal(15,2)
+	        };
         // Combined view on resource data stream
 		// TODO:
         	
