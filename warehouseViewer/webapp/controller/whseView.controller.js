@@ -20,6 +20,8 @@ sap.ui.define([
 	var oListBindingResources;
 	var oModelResources;
 	var bRequestComplete = true;
+	// ----------- Collision indicator
+	var sCollision = "None";
 
 	// ----------- Threejs functions and variables ------------------
 	var oCamera, oScene, oRenderer, oHemiLight;
@@ -83,8 +85,8 @@ sap.ui.define([
 		var bulbStepX = 3;
 		var bulbStepZ = 3;
 		var bulbStepRes = 3;
-		
-		for (var i = 1; i < 5; i++) {
+
+		for (var i = 1; i < 4; i++) {
 			var oBulbGeometry = new THREE.SphereBufferGeometry(0.02, 16, 8);
 			var oBulbLight = new THREE.PointLight(0xffeeaa, 1, 100, 2);
 			oBulbLight.name = "Warehouse Light ".concat(i.toString());
@@ -94,11 +96,11 @@ sap.ui.define([
 				color: 0x000000
 			});
 			oBulbLight.add(new THREE.Mesh(oBulbGeometry, oBulbMat));
-			oBulbLight.position.set(bX*-1, 8, bZ);
+			oBulbLight.position.set(bX * -1, 8, bZ);
 			oBulbLight.castShadow = true;
 			oScene.add(oBulbLight);
 			bX = bX + bulbStepX;
-			if ((i % 3) == 0){
+			if ((i % 3) == 0) {
 				bX = bulbX
 				bZ = bZ + bulbStepZ;
 			}
@@ -176,9 +178,9 @@ sap.ui.define([
 		oScene.add(oFloorMesh);
 
 		// Check if the data is loaded from OData Model
-		if (binData === undefined) {
-			sleep(1000); // Yea, this is not nice...
-		}
+		/*		if (binData === undefined) {
+					sleep(1000); // Yea, this is not nice...
+				}*/
 		// Create bin visualization from EWM Masterdata
 		for (i = 0; i < binData.length; i++) {
 			var oStorageBin = binData[i];
@@ -248,12 +250,12 @@ sap.ui.define([
 				oBinMesh2.castShadow = true;
 				oBinGroup.add(oBinMesh2);
 				oBinGroup.name = oStorageBin.binNo;
-				oBinGroup.position.set(parseFloat(oStorageBin.xC), parseFloat(oStorageBin.zC) + 0.25, parseFloat(oStorageBin.yC));
+				oBinGroup.position.set(parseFloat(oStorageBin.xC), parseFloat(oStorageBin.zC) + 0.1, parseFloat(oStorageBin.yC));
 				oScene.add(oBinGroup);
 				bNormal = true; // Bin is filled to some extent
 			};
 			if (bNormal == false) {
-				oBinMesh.position.set(parseFloat(oStorageBin.xC), parseFloat(oStorageBin.zC) + 0.25, parseFloat(oStorageBin.yC));
+				oBinMesh.position.set(parseFloat(oStorageBin.xC), parseFloat(oStorageBin.zC) + 0.1, parseFloat(oStorageBin.yC));
 				oBinMesh.castShadow = true;
 				oBinMesh.name = oStorageBin.binNo;
 				oScene.add(oBinMesh);
@@ -280,6 +282,25 @@ sap.ui.define([
 			bumpScale: 0.01,
 			metalness: 0.8
 		});
+		var oTextMatCol = new THREE.MeshStandardMaterial({
+			roughness: 0.4,
+			color: 0xFF7777,
+			bumpScale: 0.01,
+			metalness: 0.5
+		});
+
+		// Collision detection indicator
+		let o3DTextGCol = await create3DText("helvetiker", "bold", "ALERT!", 10, 2, 8, 2, 0.3, true);
+		let o3DTextCol = new THREE.Mesh(o3DTextGCol, oTextMatCol);
+		o3DTextCol.scale.set(0.2, 0.2, 0.2);
+		o3DTextCol.name = "ALERT";
+		o3DTextCol.position.x = 4.5;
+		o3DTextCol.position.y = 1.5;
+		o3DTextCol.position.z = 0;
+		o3DTextCol.rotation.y = Math.PI;
+		o3DTextCol.visible = false;
+		oScene.add(o3DTextCol);
+		// --- End of collision detection indicator
 
 		// Loop over the resources
 		for (let oResource of resourceData) {
@@ -349,6 +370,22 @@ sap.ui.define([
 			}
 		}
 
+		// ----- Collision detection
+		if (sCollision == "Detected") {
+			sCollision = "InAlert";
+			let oObject3D = oThreejsScene.getObjectByName("ALERT");
+			oObject3D.visible = true
+			var oAudio = new Audio("resources/audio/airhorn.mp3");
+			oAudio.play();
+			setTimeout(function () {
+				sCollision = "None";
+				oObject3D.visible = false
+			}, 5000);
+		}
+
+		// ------ End of detection 
+
+		oRenderer.clear();
 		oRenderer.render(oScene, oCamera);
 		oViewerReference.getViewport().setShouldRenderFrame(); // Updates the SAP viewport
 
@@ -367,7 +404,7 @@ sap.ui.define([
 	}
 
 	return Controller.extend("warehouseViewer.warehouseViewer.controller.whseView", {
-		onInit: function () {
+		onInit: async function () {
 			function threejsObjectLoader(parentNode, contentResource) {
 				parentNode.add(contentResource.getSource());
 				return Promise.resolve({
@@ -408,7 +445,7 @@ sap.ui.define([
 			oViewerReference = this.getView().byId("viewer");
 
 			// Call the 3D Scene Initialization with the fetched data
-			initScene(oJSONBins.oData.WhseBins, oJSONBinTypes.oData.WhseBinTypes);
+			await initScene(oJSONBins.oData.WhseBins, oJSONBinTypes.oData.WhseBinTypes);
 
 			oViewerReference.attachSceneLoadingSucceeded(function (oEvent) {
 				// Contains the reference to the scene
@@ -435,6 +472,7 @@ sap.ui.define([
 		// Called every time the view is rendered again
 		onBeforeRendering: function () {
 			var threejsContent = this.getView().byId("viewer").getContentResources(); //TODO test only
+
 		},
 
 		onNavBack: function () {
