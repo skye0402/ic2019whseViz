@@ -76,19 +76,32 @@ sap.ui.define([
 		oScene.name = "Warehouse";
 
 		// create ceiling lights
+		var bulbX = -10;
+		var bulbZ = -5;
+		var bX = bulbX;
+		var bZ = bulbZ;
+		var bulbStepX = 3;
+		var bulbStepZ = 3;
+		var bulbStepRes = 3;
+		
 		for (var i = 1; i < 5; i++) {
 			var oBulbGeometry = new THREE.SphereBufferGeometry(0.02, 16, 8);
 			var oBulbLight = new THREE.PointLight(0xffeeaa, 1, 100, 2);
 			oBulbLight.name = "Warehouse Light ".concat(i.toString());
 			var oBulbMat = new THREE.MeshStandardMaterial({
 				emissive: 0xffffee,
-				emissiveIntensity: 0.8,
+				emissiveIntensity: 0.1,
 				color: 0x000000
 			});
 			oBulbLight.add(new THREE.Mesh(oBulbGeometry, oBulbMat));
-			oBulbLight.position.set(10, 4, i * 10);
+			oBulbLight.position.set(bX*-1, 8, bZ);
 			oBulbLight.castShadow = true;
 			oScene.add(oBulbLight);
+			bX = bX + bulbStepX;
+			if ((i % 3) == 0){
+				bX = bulbX
+				bZ = bZ + bulbStepZ;
+			}
 		}
 
 		var oHemiLight = new THREE.HemisphereLight(0xddeeff, 0x0f0e0d, 0.02);
@@ -96,10 +109,10 @@ sap.ui.define([
 		oScene.add(oHemiLight);
 		var oFloorMat =
 			new THREE.MeshStandardMaterial({
-				roughness: 0.8,
-				color: 0xffffff,
-				metalness: 0.2,
-				bumpScale: 0.0005
+				roughness: 0.9,
+				color: 0xAAAAAA,
+				metalness: 0.1,
+				bumpScale: 0.1005
 			});
 		var textureLoader = new THREE.TextureLoader();
 		textureLoader.load("resources/textures/hardwood2_diffuse.jpg", function (map) {
@@ -144,6 +157,7 @@ sap.ui.define([
 			bumpScale: 0.002,
 			metalness: 0.2,
 			transparent: true,
+			wireframe: true,
 			opacity: 0.4
 		});
 		var oBinFillMat = new THREE.MeshStandardMaterial({
@@ -153,7 +167,7 @@ sap.ui.define([
 			metalness: 0.5
 		});
 
-		var oFloorGeometry = new THREE.PlaneBufferGeometry(50, 90);
+		var oFloorGeometry = new THREE.PlaneBufferGeometry(14.6, 10);
 		var oFloorMesh = new THREE.Mesh(oFloorGeometry, oFloorMat);
 		oFloorMesh.name = "Warehouse floor";
 		oFloorMesh.receiveShadow = true;
@@ -286,9 +300,9 @@ sap.ui.define([
 					}
 				});
 				gltf.scene.name = oResource.model3D + "-" + oResource.tagID;
-				gltf.scene.position.x = parseFloat(oResource.x);
-				gltf.scene.position.y = parseFloat(oResource.z);
-				gltf.scene.position.z = parseFloat(oResource.y);
+				gltf.scene.position.x = 0;//parseFloat(oResource.x);
+				gltf.scene.position.y = 0;//parseFloat(oResource.z);
+				gltf.scene.position.z = 0;//parseFloat(oResource.y);
 				if (oResource.model3D == "Forklift") gltf.scene.rotation.y = Math.PI / 2; // Tweaking the model
 				var oResGroup = new THREE.Group();
 				oResGroup.add(gltf.scene);
