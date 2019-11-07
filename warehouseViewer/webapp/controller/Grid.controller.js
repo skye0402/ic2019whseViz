@@ -16,6 +16,17 @@ sap.ui.define([
 			press: function (oEvent) {
 				MessageToast.show("The radial micro chart is pressed.");
 			},
+			// colorFormatter: function (value) {
+			// 	if (value == "Open") {
+			// 		this.addStyleClass("green"); //green
+			// 		//this.getView().addStyleClass("yellow");
+			// 	} else if(value == "In Progress") {
+			// 		this.addStyleClass("yellow"); //yellow
+			// 	} else if(value == "Done") {
+			// 		this.addStyleClass("gray"); //gray
+			// 	}
+			// 	return value;
+			// },
 			onNavBack: function () {
 				var oHistory = History.getInstance();
 				var sPreviousHash = oHistory.getPreviousHash();
