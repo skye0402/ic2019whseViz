@@ -368,22 +368,30 @@ sap.ui.define([
 				oObject3D.rotation.y = oResource.angleZ;
 				oObject3D.rotation.z = oResource.angleY;
 			}
+			// ----- Begin Collision detection
+			if (Math.abs(oJSONResources.oData[0].x - oJSONResources.oData[1].x) < 2 &&
+				Math.abs(oJSONResources.oData[0].y - oJSONResources.oData[1].y) < 2 &&
+				sCollision != "InAlert") {
+				sCollision = "Detected";
+			}
+			// ----- End Collision detection
 		}
 
-		// ----- Collision detection
+		// ----- Collision handling
 		if (sCollision == "Detected") {
-			sCollision = "InAlert";
 			let oObject3D = oThreejsScene.getObjectByName("ALERT");
-			oObject3D.visible = true
-			var oAudio = new Audio("resources/audio/airhorn.mp3");
-			oAudio.play();
-			setTimeout(function () {
-				sCollision = "None";
-				oObject3D.visible = false
-			}, 5000);
+			if (oObject3D != undefined) {
+				sCollision = "InAlert";
+				oObject3D.visible = true
+				var oAudio = new Audio("resources/audio/airhorn.mp3");
+				oAudio.play();
+				setTimeout(function () {
+					sCollision = "None";
+					oObject3D.visible = false
+				}, 5000);
+			}
 		}
-
-		// ------ End of detection 
+		// ------ End of handling 
 
 		oRenderer.clear();
 		oRenderer.render(oScene, oCamera);
