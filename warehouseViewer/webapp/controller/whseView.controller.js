@@ -69,8 +69,8 @@ sap.ui.define([
 
 	async function initScene(binData, binTypeData) {
 		oCamera = new THREE.PerspectiveCamera(50, 1.6, 0.1, 100);
-		oCamera.position.x = -4;
-		oCamera.position.z = 4;
+		oCamera.position.x = 4;
+		oCamera.position.z = -4;
 		oCamera.position.y = 2;
 		oScene = new THREE.Scene();
 		oScene.name = "Warehouse";
@@ -89,8 +89,8 @@ sap.ui.define([
 			var oBulbLight = new THREE.PointLight(0xffeeaa, 1, 100, 2);
 			oBulbLight.name = "Warehouse Light ".concat(i.toString());
 			var oBulbMat = new THREE.MeshStandardMaterial({
-				emissive: 0xffffee,
-				emissiveIntensity: 0.1,
+				emissive: 0xeeeeee,
+				emissiveIntensity: 0.2,
 				color: 0x000000
 			});
 			oBulbLight.add(new THREE.Mesh(oBulbGeometry, oBulbMat));
@@ -112,14 +112,14 @@ sap.ui.define([
 				roughness: 0.9,
 				color: 0xAAAAAA,
 				metalness: 0.1,
-				bumpScale: 0.1005
+				bumpScale: 0.0005
 			});
 		var textureLoader = new THREE.TextureLoader();
 		textureLoader.load("resources/textures/hardwood2_diffuse.jpg", function (map) {
 			map.wrapS = THREE.RepeatWrapping;
 			map.wrapT = THREE.RepeatWrapping;
 			map.anisotropy = 4;
-			map.repeat.set(10, 24);
+			map.repeat.set(20, 48);
 			oFloorMat.map = map;
 			oFloorMat.needsUpdate = true;
 		});
@@ -127,7 +127,7 @@ sap.ui.define([
 			map.wrapS = THREE.RepeatWrapping;
 			map.wrapT = THREE.RepeatWrapping;
 			map.anisotropy = 4;
-			map.repeat.set(10, 24);
+			map.repeat.set(20, 48);
 			oFloorMat.bumpMap = map;
 			oFloorMat.needsUpdate = true;
 		});
@@ -135,7 +135,7 @@ sap.ui.define([
 			map.wrapS = THREE.RepeatWrapping;
 			map.wrapT = THREE.RepeatWrapping;
 			map.anisotropy = 4;
-			map.repeat.set(10, 24);
+			map.repeat.set(20, 48);
 			oFloorMat.roughnessMap = map;
 			oFloorMat.needsUpdate = true;
 		});
@@ -286,11 +286,12 @@ sap.ui.define([
 			let o3DTextGeo = await create3DText("helvetiker", "regular", oResource.rsrc, 10, 2, 8, 2, 0.3, true); // The 3D Name of our resource
 
 			let o3DText = new THREE.Mesh(o3DTextGeo, oTextMat);
-			o3DText.scale.set(0.05, 0.05, 0.05);
+			o3DText.scale.set(0.03, 0.03, 0.03);
 			o3DText.geometry.center();
 			o3DText.position.x = parseFloat(oResource.x);
-			o3DText.position.y = parseFloat(oResource.z) + 3;
+			o3DText.position.y = parseFloat(oResource.z) + 2;
 			o3DText.position.z = parseFloat(oResource.y);
+			o3DText.rotation.y = Math.PI;
 
 			let sModelName = "resources/" + oResource.model3D + ".gltf";
 			oLoader.load(sModelName, function (gltf) {
@@ -300,9 +301,13 @@ sap.ui.define([
 					}
 				});
 				gltf.scene.name = oResource.model3D + "-" + oResource.tagID;
-				gltf.scene.position.x = 0;//parseFloat(oResource.x);
-				gltf.scene.position.y = 0;//parseFloat(oResource.z);
-				gltf.scene.position.z = 0;//parseFloat(oResource.y);
+				gltf.scene.position.x = 0;
+				gltf.scene.position.y = 0;
+				gltf.scene.position.z = 0;
+				gltf.scene.scale.x = 0.5;
+				gltf.scene.scale.y = 0.5;
+				gltf.scene.scale.z = 0.5;
+				if (oResource.model3D == "Picker") gltf.scene.rotation.y = Math.PI; // Tweaking the model
 				if (oResource.model3D == "Forklift") gltf.scene.rotation.y = Math.PI / 2; // Tweaking the model
 				var oResGroup = new THREE.Group();
 				oResGroup.add(gltf.scene);
